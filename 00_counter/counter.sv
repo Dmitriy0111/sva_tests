@@ -30,7 +30,9 @@ module counter
     endproperty : unk
 
     inc_a : assert property(inc) else $display("Inc : Fail at time %tns",$time());
+    inc_c : cover  property(inc)      ;//$dislpay("Inc : Pass at time %tns",$time());
     unk_a : assert property(unk) else $display("Unk : Fail at time %tns",$time());
+    unk_c : cover  property(unk)      ;//$display("Unk : Pass at time %tns",$time());
     
     `endif
 

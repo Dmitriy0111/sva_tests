@@ -19,12 +19,10 @@ module counter_en
 
     `ifdef ASSERTS_SV
 
-    `define inc_e ( rst_n && en )
-
     property inc;
         @(posedge clk)
-        disable iff(!`inc_e)
-        $past(`inc_e) |-> cnt == $past(cnt) + 1'b1;
+        disable iff(!rst_n)
+        en |-> ##1 cnt == $past(cnt) + 1'b1;
     endproperty : inc
 
     property unk;
@@ -34,7 +32,9 @@ module counter_en
     endproperty : unk
 
     inc_a : assert property(inc) else $display("Inc : Fail at time %tns",$time());
+    inc_c : cover  property(inc)      ;//$display("Inc : Pass");
     unk_a : assert property(unk) else $display("Unk : Fail at time %tns",$time());
+    unk_c : cover  property(unk)      ;//$display("Unk : Pass");
     
     `endif
 

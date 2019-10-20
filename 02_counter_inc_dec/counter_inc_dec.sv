@@ -17,22 +17,30 @@ module counter_inc_dec
 
     `ifdef ASSERTS_SV
 
-    `define inc_e ( rst_n && en )
-
-    property inc_dec;
+    property inc_p;
         @(posedge clk)
-        disable iff(!rst_n || !(dec || inc))
-        $past(rst_n && (dec || inc)) |-> cnt == ( { inc , dec } == 2'b11 ? $past(cnt) : { inc , dec } == 2'b10 ? $past(cnt) + 1'b1 : { inc , dec } == 2'b01 ? $past(cnt) - 1'b1 : $past(cnt) );
-    endproperty : inc_dec
+        disable iff(!rst_n)
+            ( inc && !dec ) |-> ##1 ( cnt != ( ( $past(cnt) == 8'hFF ) ? $past(cnt) + 1 : 8'h00 ) );
+    endproperty : inc_p
 
-    property unk;
+    property dec_p;
+        @(posedge clk)
+        disable iff(!rst_n)
+            ( dec && !inc ) |-> ##1 ( cnt != ( ( $past(cnt) == 8'h00 ) ? $past(cnt) - 1 : 8'hFF ) );
+    endproperty : dec_p
+
+    property unk_p;
         @(posedge clk)
         disable iff(!rst_n)
         !$isunknown(cnt);
-    endproperty : unk
+    endproperty : unk_p
 
-    inc_dec_a : assert property(inc_dec) else $display("Inc : Fail at time %tns",$time());
-    unk_a : assert property(unk) else $display("Unk : Fail at time %tns",$time());
+    inc_a : assert property(inc_p) else $display("Inc : Fail at time %tns",$time());
+    inc_c : cover  property(inc_p)      ;// $display("Inc : Pass at time %tns",$time());
+    dec_a : assert property(dec_p) else $display("dec : Fail at time %tns",$time());
+    dec_c : cover  property(dec_p)      ;// $display("dec : Pass at time %tns",$time());
+    unk_a : assert property(unk_p) else $display("Unk : Fail at time %tns",$time());
+    unk_c : cover  property(unk_p)      ;//$display("Unk : Pass at time %tns",$time());
     
     `endif
 

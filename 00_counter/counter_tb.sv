@@ -34,7 +34,11 @@ module counter_tb();
 
     initial
     begin
-        repeat(2000) @(posedge clk);
+        repeat(2000) 
+        begin
+            $display("cnt = 0x%h at time = %tns",cnt,$time());
+            @(posedge clk);
+        end
         $stop;
     end
 
