@@ -1,4 +1,11 @@
-`include "common_settings.svh"
+/*
+*  File            :   counter_inc_dec.sv
+*  Autor           :   Vlasov D.V.
+*  Data            :   2019.10.17
+*  Language        :   SystemVerilog
+*  Description     :   This is counter
+*  Copyright(c)    :   2019 Vlasov D.V.
+*/
 
 module counter_inc_dec
 (
@@ -14,8 +21,6 @@ module counter_inc_dec
             cnt <= '0;
         else
             cnt <= cnt + ( ( inc == '1 ) ? 1'b1 : '0 ) + ( ( dec == '1 ) ? - 1'b1 : '0 );
-
-    `ifdef ASSERTS_SV
 
     property inc_p;
         @(posedge clk)
@@ -40,8 +45,6 @@ module counter_inc_dec
     dec_a : assert property(dec_p) else $display("dec : Fail at time %tns",$time());
     dec_c : cover  property(dec_p)      ;// $display("dec : Pass at time %tns",$time());
     unk_a : assert property(unk_p) else $display("Unk : Fail at time %tns",$time());
-    unk_c : cover  property(unk_p)      ;//$display("Unk : Pass at time %tns",$time());
-    
-    `endif
+    unk_c : cover  property(unk_p)      ;// $display("Unk : Pass at time %tns",$time());
 
 endmodule : counter_inc_dec

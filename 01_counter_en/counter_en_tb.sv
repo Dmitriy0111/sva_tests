@@ -1,3 +1,11 @@
+/*
+*  File            :   counter_en_tb.sv
+*  Autor           :   Vlasov D.V.
+*  Data            :   2019.10.17
+*  Language        :   SystemVerilog
+*  Description     :   This is simple counter with enable testbench
+*  Copyright(c)    :   2019 Vlasov D.V.
+*/
 
 module counter_en_tb();
 

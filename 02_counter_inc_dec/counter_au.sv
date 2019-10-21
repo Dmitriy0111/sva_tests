@@ -1,4 +1,11 @@
-`include "common_settings.svh"
+/*
+*  File            :   counter_au.sv
+*  Autor           :   Vlasov D.V.
+*  Data            :   2019.10.17
+*  Language        :   SystemVerilog
+*  Description     :   This is counter assert unit
+*  Copyright(c)    :   2019 Vlasov D.V.
+*/
 
 module counter_au
 (
@@ -8,8 +15,6 @@ module counter_au
     input   logic   [0 : 0]     dec,
     input   logic   [7 : 0]     cnt
 );
-
-    `ifdef ASSERTS_SV
 
     property inc_p;
         @(posedge clk)
@@ -35,7 +40,5 @@ module counter_au
     dec_c : cover  property(dec_p)      ;// $display("Dec : Pass at time %tns",$time());
     unk_a : assert property(unk_p) else $display("Unk %m : Fail at time %tns",$time());
     unk_c : cover  property(unk_p)      ;// $display("Unk : Pass at time %tns",$time());
-    
-    `endif
 
 endmodule : counter_au

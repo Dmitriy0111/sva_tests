@@ -1,3 +1,11 @@
+/*
+*  File            :   counter_inc_dec_tb.sv
+*  Autor           :   Vlasov D.V.
+*  Data            :   2019.10.17
+*  Language        :   SystemVerilog
+*  Description     :   This is counter testbench
+*  Copyright(c)    :   2019 Vlasov D.V.
+*/
 
 module counter_inc_dec_tb();
 

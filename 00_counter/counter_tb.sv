@@ -1,3 +1,11 @@
+/*
+*  File            :   counter_tb.sv
+*  Autor           :   Vlasov D.V.
+*  Data            :   2019.10.17
+*  Language        :   SystemVerilog
+*  Description     :   This is simple counter testbench
+*  Copyright(c)    :   2019 Vlasov D.V.
+*/
 
 module counter_tb();
 
@@ -36,7 +44,6 @@ module counter_tb();
     begin
         repeat(2000) 
         begin
-            $display("cnt = 0x%h at time = %tns",cnt,$time());
             @(posedge clk);
         end
         $stop;

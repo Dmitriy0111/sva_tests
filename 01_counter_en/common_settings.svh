@@ -1,1 +1,0 @@
-`define ASSERTS_SV

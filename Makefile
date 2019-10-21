@@ -1,16 +1,16 @@
 help:
-	$(info make sim_clean		-- delete simulation folder(out))
-	$(info make sim_gui 		-- simulate example with modelsim in gui mode)
-	$(info make sim_cmd 		-- simulate example with modelsim in cmd mode)
-	$(info make sim 			-- the same as sim_gui)
-	$(info)
+	$(info make sim_clean       -- delete simulation folder(out))
+	$(info make sim_gui         -- simulate example with modelsim in gui mode)
+	$(info make sim_cmd         -- simulate example with modelsim in cmd mode)
+	$(info make sim             -- the same as sim_gui)
+	$(info make clean           -- clean out folder)
 	$(info Open and read Makefile for details)
 	@true
 
 PWD := $(shell pwd)
 RUN = $(PWD)/run
 
-SVA_TESTS = 00_counter 01_counter_en 02_counter_inc_dec
+SVA_TESTS = 00_counter 01_counter_en 02_counter_inc_dec 03_uart_tx
 
 SVA_TEST ?= 00_counter
 
@@ -37,3 +37,6 @@ sim_gui: sim_dir
 	$(VSIM_BIN) $(VSIM_ARGS) $(VSIM_F_GUI)
 
 sim: sim_gui
+
+clean: \
+	sim_clean

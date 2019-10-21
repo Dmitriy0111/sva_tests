@@ -1,4 +1,11 @@
-`include "common_settings.svh"
+/*
+*  File            :   counter_en.sv
+*  Autor           :   Vlasov D.V.
+*  Data            :   2019.10.17
+*  Language        :   SystemVerilog
+*  Description     :   This is simple counter with enable
+*  Copyright(c)    :   2019 Vlasov D.V.
+*/
 
 module counter_en
 #(
@@ -17,8 +24,6 @@ module counter_en
             if( en )
                 cnt <= cnt + ( ( inc_dec == '1 ) ? 1'b1 : - 1'b1 );
 
-    `ifdef ASSERTS_SV
-
     property inc;
         @(posedge clk)
         disable iff(!rst_n)
@@ -35,7 +40,5 @@ module counter_en
     inc_c : cover  property(inc)      ;//$display("Inc : Pass");
     unk_a : assert property(unk) else $display("Unk : Fail at time %tns",$time());
     unk_c : cover  property(unk)      ;//$display("Unk : Pass");
-    
-    `endif
 
 endmodule : counter_en
