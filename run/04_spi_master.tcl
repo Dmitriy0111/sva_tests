@@ -64,4 +64,16 @@ add wave /spi_master_tb/spi_master_dut/post_tr_change_c
 add wave /spi_master_tb/spi_master_dut/wait_change_a
 add wave /spi_master_tb/spi_master_dut/wait_change_c
 
+add wave /spi_master_tb/spi_master_dut/idle2tr_a
+add wave /spi_master_tb/spi_master_dut/idle2tr_c
+
+add wave /spi_master_tb/spi_master_dut/tr2post_tr_a
+add wave /spi_master_tb/spi_master_dut/tr2post_tr_c
+
+add wave /spi_master_tb/spi_master_dut/post_tr2wait_a
+add wave /spi_master_tb/spi_master_dut/post_tr2wait_c
+
+add wave /spi_master_tb/spi_master_dut/wait2idle_a
+add wave /spi_master_tb/spi_master_dut/wait2idle_c
+
 run -all

@@ -22,21 +22,28 @@ module counter
         else
             cnt <= cnt + ( ( inc_dec == '1 ) ? 1'b1 : - 1'b1 );
 
-    property inc;
+    property inc_p;
         @(posedge clk)
         disable iff(!rst_n)
         $past(rst_n) |-> cnt == $past(cnt) + 1'b1;
-    endproperty : inc
+    endproperty : inc_p
 
-    property unk;
+    property unk_p;
         @(posedge clk)
         disable iff(!rst_n)
         !$isunknown(cnt);
-    endproperty : unk
+    endproperty : unk_p
 
-    inc_a : assert property(inc) else $display("Inc : Fail at time %tns",$time());
-    inc_c : cover  property(inc)      ;//$dislpay("Inc : Pass at time %tns",$time());
-    unk_a : assert property(unk) else $display("Unk : Fail at time %tns",$time());
-    unk_c : cover  property(unk)      ;//$display("Unk : Pass at time %tns",$time());
+    property rst_p;
+        @(posedge clk)
+        ( !rst_n ) |=> ( cnt == '0 );
+    endproperty : rst_p
+
+    inc_a : assert property( inc_p  ) else $display("inc_a : FAIL");
+    inc_c : cover  property( inc_p  )      ;// $info("inc_c : PASS");
+    unk_a : assert property( unk_p  ) else $display("unk_a : FAIL");
+    unk_c : cover  property( unk_p  )      ;// $info("unk_c : PASS");
+    rst_a : assert property( rst_p  ) else $warning("rst_a : FAIL");
+    rst_c : cover  property( rst_p  )      ;// $info("rst_a : PASS");
 
 endmodule : counter

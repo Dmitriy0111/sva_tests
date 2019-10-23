@@ -24,21 +24,36 @@ module counter_en
             if( en )
                 cnt <= cnt + ( ( inc_dec == '1 ) ? 1'b1 : - 1'b1 );
 
-    property inc;
+    property inc_p;
         @(posedge clk)
         disable iff(!rst_n)
-        en |-> ##1 cnt == $past(cnt) + 1'b1;
-    endproperty : inc
+        en |=> ( cnt == $past(cnt) + 1'b1 );
+    endproperty : inc_p
 
-    property unk;
+    property unk_p;
         @(posedge clk)
         disable iff(!rst_n)
         !$isunknown(cnt);
-    endproperty : unk
+    endproperty : unk_p
 
-    inc_a : assert property(inc) else $display("Inc : Fail at time %tns",$time());
-    inc_c : cover  property(inc)      ;//$display("Inc : Pass");
-    unk_a : assert property(unk) else $display("Unk : Fail at time %tns",$time());
-    unk_c : cover  property(unk)      ;//$display("Unk : Pass");
+    property rst_p;
+        @(posedge clk)
+        ( !rst_n ) |=> ( cnt == '0 );
+    endproperty : rst_p
+
+    property hold_p;
+        @(posedge clk)
+        disable iff(!rst_n)
+        ( !en ) |=> ( cnt == $past(cnt) );
+    endproperty : hold_p
+
+    inc_a   : assert property( inc_p    ) else $warning("inc_a : FAIL");
+    inc_c   : cover  property( inc_p    )      ;//$info("inc_c : PASS");
+    unk_a   : assert property( unk_p    ) else $warning("unk_a : FAIL");
+    unk_c   : cover  property( unk_p    )      ;//$info("unk_c : PASS");
+    rst_a   : assert property( rst_p    ) else $warning("rst_a : FAIL");
+    rst_c   : cover  property( rst_p    )      ;//$info("rst_c : PASS");
+    hold_a  : assert property( hold_p   ) else $warning("hold_a : FAIL");
+    hold_c  : cover  property( hold_p   )      ;//$info("hold_c : PASS");
 
 endmodule : counter_en

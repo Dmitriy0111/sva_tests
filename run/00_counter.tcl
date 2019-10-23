@@ -11,5 +11,7 @@ add wave /counter_tb/counter_dut/inc_a
 add wave /counter_tb/counter_dut/inc_c
 add wave /counter_tb/counter_dut/unk_a
 add wave /counter_tb/counter_dut/unk_c
+add wave /counter_tb/counter_dut/rst_a
+add wave /counter_tb/counter_dut/rst_c
 
 run -all

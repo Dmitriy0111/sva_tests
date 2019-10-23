@@ -172,144 +172,103 @@ module spi_master
     ///////////////////////////////////////////////////////////////////////////////////////////
     //                                       Properties                                      //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    property rst_data_int_p;
-        @(posedge clk)  ( !resetn ) |=> ( data_int == '0 );
-    endproperty : rst_data_int_p
-
-    property rst_cpol_int_p;
-        @(posedge clk)  ( !resetn ) |=> ( cpol_int == '0 );
-    endproperty : rst_cpol_int_p
-
-    property rst_cpha_int_p;
-        @(posedge clk)  ( !resetn ) |=> ( cpha_int == '0 );
-    endproperty : rst_cpha_int_p
-
-    property rst_comp_int_p;
-        @(posedge clk)  ( !resetn ) |=> ( comp_int == '0 );
-    endproperty : rst_comp_int_p
-
-    property rst_comp_c_p;
-        @(posedge clk)  ( !resetn ) |=> ( comp_c == '0 );
-    endproperty : rst_comp_c_p
-
-    property rst_bit_c_p;
-        @(posedge clk)  ( !resetn ) |=> ( bit_c == '0 );
-    endproperty : rst_bit_c_p
-
-    property rst_tx_req_ack_p;
-        @(posedge clk)  ( !resetn ) |=> ( tx_req_ack == '0 );
-    endproperty : rst_tx_req_ack_p
-
-    property rst_sck_int_p;
-        @(posedge clk)  ( !resetn ) |=> ( sck_int == '0 );
-    endproperty : rst_sck_int_p
-
-    property rst_cs_p;
-        @(posedge clk)  ( !resetn ) |=> ( cs == '1 );
-    endproperty : rst_cs_p
-
-    property rst_sdo_p;
-        @(posedge clk)  ( !resetn ) |=> ( sdo == '1 );
-    endproperty : rst_sdo_p
-
-    property rst_msb_lsb_int_p;
-        @(posedge clk)  ( !resetn ) |=> ( msb_lsb_int == '0 );
-    endproperty : rst_msb_lsb_int_p
-
-    property unk_data_int_p;
+    // reset test property
+    property rst_test(test_v,comp_v);
+        @(posedge clk) ( !resetn ) |=> ( test_v == comp_v );
+    endproperty : rst_test
+    // unknown test property
+    property unk_test(test_v);
         @(posedge clk) disable iff( !resetn || !tr_en )
-        ( tx_req && ( state == IDLE_s ) ) |=> ( ! $isunknown(data_int) );
-    endproperty : unk_data_int_p
-    property unk_cpol_int_p;
+        ( tx_req && ( state == IDLE_s ) ) |=> ( ! $isunknown(test_v) );
+    endproperty : unk_test
+    // check state_changing
+    property state_change(c_state,cond,n_state);
         @(posedge clk) disable iff( !resetn || !tr_en )
-        ( tx_req && ( state == IDLE_s ) ) |=> ( ! $isunknown(cpol_int) );
-    endproperty : unk_cpol_int_p
-    property unk_cpha_int_p;
+        ( ( state == c_state ) && ( cond == '1 ) ) |=> ( state == n_state );
+    endproperty : state_change
+    // check state_changing
+    property state_change_(c_state,logic [2 : 0] n_state[]);
         @(posedge clk) disable iff( !resetn || !tr_en )
-        ( tx_req && ( state == IDLE_s ) ) |=> ( ! $isunknown(cpha_int) );
-    endproperty : unk_cpha_int_p
-    property unk_comp_int_p;
-        @(posedge clk) disable iff( !resetn || !tr_en )
-        ( tx_req && ( state == IDLE_s ) ) |=> ( ! $isunknown(comp_int) );
-    endproperty : unk_comp_int_p
-
-    property idle_change_p;
-        @(posedge clk) disable iff(!resetn || !tr_en)
-        ( state == IDLE_s ) |=> ( ( state == $past(state) ) || ( state == TRANSMIT_s ) );
-    endproperty : idle_change_p
-
-    property transmit_change_p;
-        @(posedge clk) disable iff(!resetn || !tr_en)
-        ( state == TRANSMIT_s ) |=> ( ( state == $past(state) ) || ( state == POST_TR_s ) );
-    endproperty : transmit_change_p
-
-    property post_tr_change_p;
-        @(posedge clk) disable iff(!resetn || !tr_en)
-        ( state == POST_TR_s ) |=> ( ( state == $past(state) ) || ( state == WAIT_s ) );
-    endproperty : post_tr_change_p
-
-    property wait_change_p;
-        @(posedge clk) disable iff(!resetn || !tr_en)
-        ( state == WAIT_s ) |=> ( ( state == $past(state) ) || ( state == IDLE_s ) );
-    endproperty : wait_change_p
+        ( state == c_state ) |=> ( $stable(state) || ( test_state(state,n_state) == '1 ) );
+    endproperty : state_change_
+    //
+    function bit test_state(logic [2 : 0] c_state, logic [2 : 0] n_state[]);
+        foreach( n_state[i] )
+            if( n_state[i] == c_state )
+                return '1;
+        return '0;
+    endfunction : test_state
     ///////////////////////////////////////////////////////////////////////////////////////////
     //                                  Assertions and covers                                //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    rst_data_int_a      : assert property( rst_data_int_p       ) else $display("rst_data_int_a: Fail at time %tns",$time());
-    rst_data_int_c      : cover  property( rst_data_int_p       )      ;// $display("rst_data_int_c: Pass at time %tns",$time());
 
-    rst_cpol_int_a      : assert property( rst_cpol_int_p       ) else $display("rst_cpol_int_a: Fail at time %tns",$time());
-    rst_cpol_int_c      : cover  property( rst_cpol_int_p       )      ;// $display("rst_cpol_int_c: Pass at time %tns",$time());
+    rst_data_int_a      : assert property( rst_test( data_int    , '0 )     ) else $warning("rst_data_int_a: FAIL");
+    rst_data_int_c      : cover  property( rst_test( data_int    , '0 )     )      ;// $info("rst_data_int_c: PASS");
 
-    rst_cpha_int_a      : assert property( rst_cpha_int_p       ) else $display("rst_cpha_int_a: Fail at time %tns",$time());
-    rst_cpha_int_c      : cover  property( rst_cpha_int_p       )      ;// $display("rst_cpha_int_c: Pass at time %tns",$time());
+    rst_cpol_int_a      : assert property( rst_test( cpol_int    , '0 )     ) else $warning("rst_cpol_int_a: FAIL");
+    rst_cpol_int_c      : cover  property( rst_test( cpol_int    , '0 )     )      ;// $info("rst_cpol_int_c: PASS");
 
-    rst_comp_int_a      : assert property( rst_comp_int_p       ) else $display("rst_comp_int_a: Fail at time %tns",$time());
-    rst_comp_int_c      : cover  property( rst_comp_int_p       )      ;// $display("rst_comp_int_c: Pass at time %tns",$time());
+    rst_cpha_int_a      : assert property( rst_test( cpha_int    , '0 )     ) else $warning("rst_cpha_int_a: FAIL");
+    rst_cpha_int_c      : cover  property( rst_test( cpha_int    , '0 )     )      ;// $info("rst_cpha_int_c: PASS");
 
-    rst_comp_c_a        : assert property( rst_comp_c_p         ) else $display("rst_comp_c_a: Fail at time %tns",$time());
-    rst_comp_c_c        : cover  property( rst_comp_c_p         )      ;// $display("rst_comp_c_c: Pass at time %tns",$time());
+    rst_comp_int_a      : assert property( rst_test( comp_int    , '0 )     ) else $warning("rst_comp_int_a: FAIL");
+    rst_comp_int_c      : cover  property( rst_test( comp_int    , '0 )     )      ;// $info("rst_comp_int_c: PASS");
 
-    rst_bit_c_a         : assert property( rst_bit_c_p          ) else $display("rst_bit_c_a: Fail at time %tns",$time());
-    rst_bit_c_c         : cover  property( rst_bit_c_p          )      ;// $display("rst_bit_c_c: Pass at time %tns",$time());
+    rst_comp_c_a        : assert property( rst_test( comp_c      , '0 )     ) else $warning("rst_comp_c_a: FAIL");
+    rst_comp_c_c        : cover  property( rst_test( comp_c      , '0 )     )      ;// $info("rst_comp_c_c: PASS");
 
-    rst_tx_req_ack_a    : assert property( rst_tx_req_ack_p     ) else $display("rst_tx_req_ack_a: Fail at time %tns",$time());
-    rst_tx_req_ack_c    : cover  property( rst_tx_req_ack_p     )      ;// $display("rst_tx_req_ack_c: Pass at time %tns",$time());
+    rst_bit_c_a         : assert property( rst_test( bit_c       , '0 )     ) else $warning("rst_bit_c_a: FAIL");
+    rst_bit_c_c         : cover  property( rst_test( bit_c       , '0 )     )      ;// $info("rst_bit_c_c: PASS");
 
-    rst_sck_int_a       : assert property( rst_sck_int_p        ) else $display("rst_sck_int_a: Fail at time %tns",$time());
-    rst_sck_int_c       : cover  property( rst_sck_int_p        )      ;// $display("rst_sck_int_c: Pass at time %tns",$time());
+    rst_tx_req_ack_a    : assert property( rst_test( tx_req_ack  , '0 )     ) else $warning("rst_tx_req_ack_a: FAIL");
+    rst_tx_req_ack_c    : cover  property( rst_test( tx_req_ack  , '0 )     )      ;// $info("rst_tx_req_ack_c: PASS");
 
-    rst_cs_a            : assert property( rst_cs_p             ) else $display("rst_cs_a: Fail at time %tns",$time());
-    rst_cs_c            : cover  property( rst_cs_p             )      ;// $display("rst_cs_c: Pass at time %tns",$time());
+    rst_sck_int_a       : assert property( rst_test( sck_int     , '0 )     ) else $warning("rst_sck_int_a: FAIL");
+    rst_sck_int_c       : cover  property( rst_test( sck_int     , '0 )     )      ;// $info("rst_sck_int_c: PASS");
 
-    rst_sdo_a           : assert property( rst_sdo_p            ) else $display("rst_sdo_a: Fail at time %tns",$time());
-    rst_sdo_c           : cover  property( rst_sdo_p            )      ;// $display("rst_sdo_c: Pass at time %tns",$time());
+    rst_cs_a            : assert property( rst_test( cs          , '1 )     ) else $warning("rst_cs_a: FAIL");
+    rst_cs_c            : cover  property( rst_test( cs          , '1 )     )      ;// $info("rst_cs_c: PASS");
 
-    rst_msb_lsb_int_a   : assert property( rst_msb_lsb_int_p    ) else $display("rst_msb_lsb_int_a: Fail at time %tns",$time());
-    rst_msb_lsb_int_c   : cover  property( rst_msb_lsb_int_p    )      ;// $display("rst_msb_lsb_int_c: Pass at time %tns",$time());
+    rst_sdo_a           : assert property( rst_test( sdo         , '1 )     ) else $warning("rst_sdo_a: FAIL");
+    rst_sdo_c           : cover  property( rst_test( sdo         , '1 )     )      ;// $info("rst_sdo_c: PASS");
 
-    unk_data_int_a      : assert property( unk_data_int_p       ) else $display("unk_data_int_a: Fail at time %tns",$time());
-    unk_data_int_c      : cover  property( unk_data_int_p       )      ;// $display("unk_data_int_c: Pass at time %tns",$time());
+    rst_msb_lsb_int_a   : assert property( rst_test( msb_lsb_int , '0 )     ) else $warning("rst_msb_lsb_int_a: FAIL");
+    rst_msb_lsb_int_c   : cover  property( rst_test( msb_lsb_int , '0 )     )      ;// $info("rst_msb_lsb_int_c: PASS");
 
-    unk_cpol_int_a      : assert property( unk_cpol_int_p       ) else $display("unk_cpol_int_a: Fail at time %tns",$time());
-    unk_cpol_int_c      : cover  property( unk_cpol_int_p       )      ;// $display("unk_cpol_int_c: Pass at time %tns",$time());
+    unk_data_int_a      : assert property( unk_test( data_int )     ) else $warning("unk_data_int_a: FAIL");
+    unk_data_int_c      : cover  property( unk_test( data_int )     )      ;// $info("unk_data_int_c: PASS");
 
-    unk_cpha_int_a      : assert property( unk_cpha_int_p       ) else $display("unk_cpha_int_a: Fail at time %tns",$time());
-    unk_cpha_int_c      : cover  property( unk_cpha_int_p       )      ;// $display("unk_cpha_int_c: Pass at time %tns",$time());
+    unk_cpol_int_a      : assert property( unk_test( cpol_int )     ) else $warning("unk_cpol_int_a: FAIL");
+    unk_cpol_int_c      : cover  property( unk_test( cpol_int )     )      ;// $info("unk_cpol_int_c: PASS");
 
-    unk_comp_int_a      : assert property( unk_comp_int_p       ) else $display("unk_comp_int_a: Fail at time %tns",$time());
-    unk_comp_int_c      : cover  property( unk_comp_int_p       )      ;// $display("unk_comp_int_c: Pass at time %tns",$time());
+    unk_cpha_int_a      : assert property( unk_test( cpha_int )     ) else $warning("unk_cpha_int_a: FAIL");
+    unk_cpha_int_c      : cover  property( unk_test( cpha_int )     )      ;// $info("unk_cpha_int_c: PASS");
 
-    idle_change_a       : assert property( idle_change_p        ) else $display("idle_change_a: Fail at time %tns",$time());
-    idle_change_c       : cover  property( idle_change_p        )      ;// $display("idle_change_c: Pass at time %tns",$time());
+    unk_comp_int_a      : assert property( unk_test( comp_int )     ) else $warning("unk_comp_int_a: FAIL");
+    unk_comp_int_c      : cover  property( unk_test( comp_int )     )      ;// $info("unk_comp_int_c: PASS");
 
-    transmit_change_a   : assert property( transmit_change_p    ) else $display("transmit_change_a: Fail at time %tns",$time());
-    transmit_change_c   : cover  property( transmit_change_p    )      ;// $display("transmit_change_c: Pass at time %tns",$time());
+    idle_change_a       : assert property( state_change_( IDLE_s     , { TRANSMIT_s } )     ) else $warning("idle_change_a: FAIL");
+    idle_change_c       : cover  property( state_change_( IDLE_s     , { TRANSMIT_s } )     )      ;// $info("idle_change_c: PASS");
 
-    post_tr_change_a    : assert property( post_tr_change_p     ) else $display("post_tr_change_a: Fail at time %tns",$time());
-    post_tr_change_c    : cover  property( post_tr_change_p     )      ;// $display("post_tr_change_c: Pass at time %tns",$time());
+    transmit_change_a   : assert property( state_change_( TRANSMIT_s , { POST_TR_s  } )     ) else $warning("transmit_change_a: FAIL");
+    transmit_change_c   : cover  property( state_change_( TRANSMIT_s , { POST_TR_s  } )     )      ;// $info("transmit_change_c: PASS");
 
-    wait_change_a       : assert property( wait_change_p        ) else $display("wait_change_a: Fail at time %tns",$time());
-    wait_change_c       : cover  property( wait_change_p        )      ;// $display("wait_change_c: Pass at time %tns",$time());
+    post_tr_change_a    : assert property( state_change_( POST_TR_s  , { WAIT_s     } )     ) else $warning("post_tr_change_a: FAIL");
+    post_tr_change_c    : cover  property( state_change_( POST_TR_s  , { WAIT_s     } )     )      ;// $info("post_tr_change_c: PASS");
+    
+    wait_change_a       : assert property( state_change_( WAIT_s     , { IDLE_s     } )     ) else $warning("wait_change_a: FAIL");
+    wait_change_c       : cover  property( state_change_( WAIT_s     , { IDLE_s     } )     )      ;// $info("wait_change_c: PASS");
+
+    idle2tr_a           : assert property( state_change( IDLE_s     , idle2tr      , TRANSMIT_s )   ) else $warning("idle2tr_a: FAIL");
+    idle2tr_c           : cover  property( state_change( IDLE_s     , idle2tr      , TRANSMIT_s )   )      ;// $info("idle2tr_c: PASS");
+
+    tr2post_tr_a        : assert property( state_change( TRANSMIT_s , tr2post_tr   , POST_TR_s  )   ) else $warning("tr2post_tr_a: FAIL");
+    tr2post_tr_c        : cover  property( state_change( TRANSMIT_s , tr2post_tr   , POST_TR_s  )   )      ;// $info("tr2post_tr_c: PASS");
+
+    post_tr2wait_a      : assert property( state_change( POST_TR_s  , post_tr2wait , WAIT_s     )   ) else $warning("post_tr2wait_a: FAIL");
+    post_tr2wait_c      : cover  property( state_change( POST_TR_s  , post_tr2wait , WAIT_s     )   )      ;// $info("post_tr2wait_c: PASS");
+
+    wait2idle_a         : assert property( state_change( WAIT_s     , wait2idle    , IDLE_s     )   ) else $warning("wait2idle_a: FAIL");
+    wait2idle_c         : cover  property( state_change( WAIT_s     , wait2idle    , IDLE_s     )   )      ;// $info("wait2idle_c: PASS");
     
 endmodule : spi_master

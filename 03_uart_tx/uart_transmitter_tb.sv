@@ -1,5 +1,5 @@
 /*
-*  File            :   uart_transmitter_tb_sv.sv
+*  File            :   uart_transmitter_tb.sv
 *  Autor           :   Vlasov D.V.
 *  Data            :   2019.08.22
 *  Language        :   SystemVerilog
@@ -7,7 +7,7 @@
 *  Copyright(c)    :   2019 Vlasov D.V.
 */
 
-module uart_transmitter_tb_sv();
+module uart_transmitter_tb();
 
     parameter           T = 10,
                         repeat_n = 10,
@@ -26,8 +26,8 @@ module uart_transmitter_tb_sv();
     logic   [0  : 0]    tx_req_ack;
     logic   [0  : 0]    uart_tx;
 
-    uart_transmitter_sv
-    uart_transmitter_sv_dut 
+    uart_transmitter
+    uart_transmitter_dut 
     (
         // clock and reset
         .clk            ( clk           ),
@@ -40,6 +40,13 @@ module uart_transmitter_tb_sv();
         .tx_req         ( tx_req        ),
         .tx_req_ack     ( tx_req_ack    ),
         .uart_tx        ( uart_tx       )
+    );
+
+    bind uart_transmitter_dut
+    uart_transmitter_pm 
+    uart_transmitter_pm_0
+    (
+        .*
     );
 
     initial
@@ -92,4 +99,4 @@ module uart_transmitter_tb_sv();
         @(posedge clk);
     endtask : uart_write
     
-endmodule : uart_transmitter_tb_sv
+endmodule : uart_transmitter_tb

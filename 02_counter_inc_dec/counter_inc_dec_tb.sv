@@ -9,6 +9,11 @@
 
 module counter_inc_dec_tb();
 
+    parameter           T = 10,
+                        rst_delay = 7,
+                        start_delay = 200,
+                        rep_c = 2000;
+
     logic   [0 : 0]     clk;
     logic   [0 : 0]     rst_n;
     logic   [0 : 0]     inc;
@@ -38,25 +43,25 @@ module counter_inc_dec_tb();
 
     initial
     begin
-        #(20);
+        #(start_delay);
         clk = '0;
         forever
-            #(5) clk = !clk;
+            #(T/2) clk = !clk;
     end
 
     initial
     begin
-        #(20);
+        #(start_delay);
         rst_n = '0;
-        repeat(7) @(posedge clk);
+        repeat(rst_delay) @(posedge clk);
         rst_n = '1;
     end
 
     initial
     begin
-        #(20);
+        #(start_delay);
         @(posedge rst_n);
-        repeat(2000)
+        repeat(rep_c)
         begin
             dec = $urandom_range(0,1);
             inc = $urandom_range(0,1);

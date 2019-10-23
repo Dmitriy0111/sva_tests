@@ -9,6 +9,11 @@
 
 module counter_en_tb();
 
+    parameter           T = 10,
+                        rst_delay = 7,
+                        start_delay = 200,
+                        rep_c = 2000;
+
     logic   [0 : 0]     clk;
     logic   [0 : 0]     rst_n;
     logic   [0 : 0]     en;
@@ -28,23 +33,23 @@ module counter_en_tb();
 
     initial
     begin
-        #(20);
+        #(start_delay);
         clk = '0;
         forever
-            #(5) clk = !clk;
+            #(T/2) clk = !clk;
     end
 
     initial
     begin
-        #(20);
+        #(start_delay);
         rst_n = '0;
-        repeat(7) @(posedge clk);
+        repeat(rst_delay) @(posedge clk);
         rst_n = '1;
     end
 
     initial
     begin
-        repeat(2000)
+        repeat(rep_c)
         begin
             en = $urandom_range(0,1);
             @(posedge clk);
