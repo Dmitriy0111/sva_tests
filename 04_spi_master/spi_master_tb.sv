@@ -82,7 +82,7 @@ module spi_master_tb();
         repeat(repeat_n)
         begin
             #100;
-            uart_write();
+            data_write();
         end
         $stop;
     end
@@ -97,7 +97,7 @@ module spi_master_tb();
         end
     end
 
-    task uart_write();
+    task data_write();
         tx_req = '1;
         tx_data = $urandom_range(0,255);
         case($urandom_range(0,9))
@@ -124,6 +124,6 @@ module spi_master_tb();
         @(posedge tx_req_ack);
         tx_req = '0;
         @(posedge clk);
-    endtask : uart_write
+    endtask : data_write
     
 endmodule : spi_master_tb
