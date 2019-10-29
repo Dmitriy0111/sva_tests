@@ -44,31 +44,12 @@ module simple_spi_pm
     property rst_test(test_v,rst_cond,comp_v);
         @(posedge clk_i) ( rst_cond ) |=> ( test_v == comp_v );
     endproperty : rst_test
-        
-    property test_dat_o_p();
-        @(posedge clk_i)
-        disable iff( rst_i )
-        if      ( adr_i == 3'b000 ) ( '1 |=> ( dat_o == $past(spcr)   ) )
-        else if ( adr_i == 3'b001 ) ( '1 |=> ( dat_o == $past(spsr)   ) )
-        else if ( adr_i == 3'b010 ) ( '1 |=> ( dat_o == $past(rfdout) || $isunknown(rfdout) ) )
-        else if ( adr_i == 3'b011 ) ( '1 |=> ( dat_o == $past(sper)   ) )
-        else if ( adr_i == 3'b100 ) ( '1 |=> ( dat_o == $past(ss_r)   ) )
-        else                        ( '1 |=> ( dat_o == '0            ) );
-        //case( adr_i )
-        //    3'b000  :   ( '1 |=> ( dat_o == $past(spcr)   ) );
-        //    3'b001  :   ( '1 |=> ( dat_o == $past(spsr)   ) );
-        //    3'b010  :   ( '1 |=> ( dat_o == $past(rfdout) ) );
-        //    3'b011  :   ( '1 |=> ( dat_o == $past(sper)   ) );
-        //    3'b100  :   ( '1 |=> ( dat_o == $past(ss_r)   ) );
-        //    default :   ( '1 |=> ( dat_o == '0            ) );
-        //endcase
-    endproperty : test_dat_o_p
 
     property test_clock_div_p;
         @(posedge clk_i)
         disable iff( rst_i )
-        if      ( spe & ( |clkcnt & |state ) ) ( '1 |=> ( clkcnt == ( $past(clkcnt) - 1'b1 ) ) )
-        else if ( espr == 4'b0000            ) ( '1 |=> ( clkcnt == 12'h0                    ) )
+        !( spe & ( |clkcnt & |state ) ) |->
+        if      ( espr == 4'b0000            ) ( '1 |=> ( clkcnt == 12'h0                    ) )
         else if ( espr == 4'b0001            ) ( '1 |=> ( clkcnt == 12'h1                    ) )
         else if ( espr == 4'b0010            ) ( '1 |=> ( clkcnt == 12'h3                    ) )
         else if ( espr == 4'b0011            ) ( '1 |=> ( clkcnt == 12'hf                    ) )
@@ -125,9 +106,6 @@ module simple_spi_pm
 
     rst_sck_o_a     : assert property( rst_test( sck_o , ~spe | rst_i , '0    ) ) else $warning("rst_sck_o_a : FAIL");
     rst_sck_o_c     : cover  property( rst_test( sck_o , ~spe | rst_i , '0    ) )      ;// $info("rst_sck_o_c : PASS");
-    // check data output
-    test_dat_o_a    : assert property( test_dat_o_p ) else $warning("test_dat_o_a : FAIL");
-    test_dat_o_c    : cover  property( test_dat_o_p )      ;// $info("test_dat_o_c : PASS");
     // check clock div
     test_clock_div_a    : assert property( test_clock_div_p ) else $warning("test_clock_div_a : FAIL");
     test_clock_div_c    : cover  property( test_clock_div_p )      ;// $info("test_clock_div_c : PASS");

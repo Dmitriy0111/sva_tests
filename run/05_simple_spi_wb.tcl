@@ -43,9 +43,6 @@ add wave /simple_spi_tb/simple_spi_dut/simple_spi_pm_0/rst_rfwe_c
 add wave /simple_spi_tb/simple_spi_dut/simple_spi_pm_0/rst_sck_o_a
 add wave /simple_spi_tb/simple_spi_dut/simple_spi_pm_0/rst_sck_o_c
 
-add wave /simple_spi_tb/simple_spi_dut/simple_spi_pm_0/test_dat_o_a
-add wave /simple_spi_tb/simple_spi_dut/simple_spi_pm_0/test_dat_o_c
-
 add wave /simple_spi_tb/simple_spi_dut/simple_spi_pm_0/test_clock_div_a
 add wave /simple_spi_tb/simple_spi_dut/simple_spi_pm_0/test_clock_div_c
 
