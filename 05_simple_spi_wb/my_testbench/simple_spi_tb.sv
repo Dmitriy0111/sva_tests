@@ -15,7 +15,7 @@
 module simple_spi_tb();
 
     parameter           T = 10,
-                        repeat_n = 100,
+                        repeat_n = 2000,
                         rst_delay = 7,
                         start_delay = 200;
 
@@ -33,6 +33,11 @@ module simple_spi_tb();
 
     logic   [7 : 0]     r_data_wb;
     bit     [0 : 0]     spi_ie;
+
+    logic   [7 : 0]     spi_drv_tx[$];
+    logic   [7 : 0]     spi_mon_tx[$];
+    logic   [7 : 0]     spi_drv_rx[$];
+    logic   [7 : 0]     spi_mon_rx[$];
 
     wb_if       
     wb_if_
@@ -103,7 +108,7 @@ module simple_spi_tb();
             initial
             begin
                 spi_monitor_[mon_i] = new( spi_if_ , $psprintf("SPI_mon_%0d",mon_i) , mon_i );
-                spi_monitor_[mon_i].run();
+                spi_monitor_[mon_i].run(spi_mon_tx,spi_mon_rx);
             end
         end
     endgenerate
@@ -133,13 +138,12 @@ module simple_spi_tb();
         @(negedge rst_i);
         repeat(repeat_n)
         begin
-            wb_random_gen_0.randomize();
+            $display("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            assert(wb_random_gen_0.randomize()) else $stop;
             foreach(spi_monitor_[i])
-            begin
                 spi_monitor_[i].set_spi_mode(wb_random_gen_0.spi_mode);
-                spi_monitor_[i].set_spi_clk_div(wb_random_gen_0.spi_clk_div);
-            end
             spi_ie = wb_random_gen_0.spi_ie;
+            spi_drv_tx.push_back(wb_random_gen_0.tr_data);
             wb_driver_0.write_data(3'b000, wb_random_gen_0.spcr    );
             wb_driver_0.write_data(3'b011, wb_random_gen_0.sper    );
             wb_driver_0.write_data(3'b100, wb_random_gen_0.ss_sel  );
@@ -152,8 +156,16 @@ module simple_spi_tb();
             while( ( r_data_wb & 8'h80 ) == 0 );
             else
                 @(posedge inta_o);
+            wb_driver_0.read_data(3'b001,r_data_wb);
             wb_driver_0.write_data(3'b100, '0 );
-            wb_driver_0.write_data(3'b001, r_data_wb );
+            wb_driver_0.write_data(3'b001,r_data_wb | (1'b1 << 8) );
+            wb_driver_0.read_data(3'b010,r_data_wb);
+            spi_drv_rx.push_back(r_data_wb);
+            $display("SPI_WB receive data = 0x%h", r_data_wb);
+            if( spi_drv_tx.pop_front() != spi_mon_rx.pop_front() )
+                $error("FAIL");
+            if( spi_drv_rx.pop_front() != spi_mon_tx.pop_front() )
+                $error("FAIL");
         end
         repeat (200) @(posedge clk_i);
         $stop;

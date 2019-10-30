@@ -18,10 +18,7 @@ class spi_monitor #(parameter ss_width = 1);
     int                 N = 0;
 
     logic   [1 : 0]     spi_mode;
-    logic   [3 : 0]     spi_clk_div;
-    logic   [7 : 0]     rec_data;
-    int                 counter;
-    int                 counter_pre;
+    logic   [7 : 0]     shift_reg;
 
     function new(virtual spi_if #(ss_width) spi_vif, string name = "", int N = 0);
         this.spi_vif = spi_vif;
@@ -33,35 +30,46 @@ class spi_monitor #(parameter ss_width = 1);
         this.spi_mode = spi_mode;
     endtask : set_spi_mode
 
-    task set_spi_clk_div(logic [3 : 0] spi_clk_div);
-        this.spi_clk_div = spi_clk_div;
-    endtask : set_spi_clk_div
-
-    task find_counter();
-        case( spi_clk_div )
-            4'b0000 : counter_pre <= 12'h0;
-            4'b0001 : counter_pre <= 12'h1;
-            4'b0010 : counter_pre <= 12'h3;
-            4'b0011 : counter_pre <= 12'hf;
-            4'b0100 : counter_pre <= 12'h1f;
-            4'b0101 : counter_pre <= 12'h7;
-            4'b0110 : counter_pre <= 12'h3f;
-            4'b0111 : counter_pre <= 12'h7f;
-            4'b1000 : counter_pre <= 12'hff;
-            4'b1001 : counter_pre <= 12'h1ff;
-            4'b1010 : counter_pre <= 12'h3ff;
-            4'b1011 : counter_pre <= 12'h7ff;
-            default : $warning("clock divide not defined");
-        endcase
-    endtask : find_counter
-
-    task run();
+    task run(ref logic [7 : 0] mon_tx_data[$], ref logic [7 : 0] mon_rx_data[$]);
         forever
         begin
             @(negedge spi_vif.ss[N]);
-            $display("Monitor %s detect negedge ss signal", name);
-            spi_vif.miso_drv[N] = $urandom_range(0,1);
+            shift_reg = $urandom_range(0,255);
+            $display("%s random tx data = 0x%h",name,shift_reg);
+            mon_tx_data.push_back(shift_reg);
+            $display("%s detect negedge ss signal", name);
+            repeat(8)
+            begin
+                if( spi_mode[0] == '0)
+                begin
+                    spi_vif.miso_drv[N] = shift_reg[7];
+                    if( spi_mode[1] == '0 )
+                        @(posedge spi_vif.sck);
+                    else
+                        @(negedge spi_vif.sck);
+                    shift_reg = { shift_reg , spi_vif.mosi };
+                    if( spi_mode[1] == '0 )
+                        @(negedge spi_vif.sck);
+                    else
+                        @(posedge spi_vif.sck);
+                end
+                else
+                begin
+                    if( spi_mode[1] == '0 )
+                        @(posedge spi_vif.sck);
+                    else
+                        @(negedge spi_vif.sck);
+                    spi_vif.miso_drv[N] = shift_reg[7];
+                    if( spi_mode[1] == '0 )
+                        @(negedge spi_vif.sck);
+                    else
+                        @(posedge spi_vif.sck);
+                    shift_reg = { shift_reg , spi_vif.mosi };
+                end
+            end
+            mon_rx_data.push_back(shift_reg);
             @(posedge spi_vif.ss[N]);
+            $display("%s receive data = 0x%h",name,shift_reg);
             spi_vif.miso_drv[N] = 'x;
         end
     endtask : run

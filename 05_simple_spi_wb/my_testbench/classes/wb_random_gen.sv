@@ -41,6 +41,10 @@ class wb_random_gen;
         spi_slave_n inside { [0:num_spi_slaves-1] };
     }
 
+    constraint spi_ie_{
+        spi_ie inside { ['0:'1] };
+    }
+
     function void post_randomize();
         tr_data = spi_tr_data;
         spcr = { spi_ie , 1'b1 , 1'b0 , 1'b1 , spi_mode , spi_clk_div[1:0] };
@@ -48,7 +52,10 @@ class wb_random_gen;
         ss_sel = 1'b1 << spi_slave_n;
         $display("Form new transaction:");
         $display("spcr    = 0x%h", spcr);
+        $display("cpol    = %b"  , spi_mode[1]);
+        $display("cpha    = %b"  , spi_mode[0]);
         $display("sper    = 0x%h", sper);
+        $display("clk_div = 0x%h", spi_clk_div);
         $display("tx_data = 0x%h", tr_data);
         $display("ss_sel  = 0b%b", ss_sel);
     endfunction : post_randomize

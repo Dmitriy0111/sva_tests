@@ -5,7 +5,7 @@ vlog -sv ../05_simple_spi_wb/simple_spi/rtl/verilog/*.*v
 vlog -sv ../05_simple_spi_wb/my_testbench/*.*v
 vlog -sv ../05_simple_spi_wb/my_testbench/classes/*.*v
 
-vsim -novopt work.simple_spi_tb
+vsim -novopt work.simple_spi_tb -assertdebug
 
 add wave -divider "DUT signals"
 add wave /simple_spi_tb/simple_spi_dut/*
