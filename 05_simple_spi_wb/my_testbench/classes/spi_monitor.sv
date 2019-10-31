@@ -15,15 +15,15 @@ class spi_monitor #(parameter ss_width = 1);
     virtual spi_if  #(ss_width)spi_vif;
 
     string              name = "";
-    int                 N = 0;
+    int                 mon_number = 0;
 
     logic   [1 : 0]     spi_mode;
     logic   [7 : 0]     shift_reg;
 
-    function new(virtual spi_if #(ss_width) spi_vif, string name = "", int N = 0);
+    function new(virtual spi_if #(ss_width) spi_vif, string name = "", int mon_number = 0);
         this.spi_vif = spi_vif;
         this.name = name;
-        this.N = N;
+        this.mon_number = mon_number;
     endfunction : new
 
     task set_spi_mode(logic [1 : 0] spi_mode);
@@ -33,7 +33,7 @@ class spi_monitor #(parameter ss_width = 1);
     task run(ref logic [7 : 0] mon_tx_data[$], ref logic [7 : 0] mon_rx_data[$]);
         forever
         begin
-            @(negedge spi_vif.ss[N]);
+            @(negedge spi_vif.ss[mon_number]);
             shift_reg = $urandom_range(0,255);
             $display("%s random tx data = 0x%h",name,shift_reg);
             mon_tx_data.push_back(shift_reg);
@@ -42,7 +42,7 @@ class spi_monitor #(parameter ss_width = 1);
             begin
                 if( spi_mode[0] == '0)
                 begin
-                    spi_vif.miso_drv[N] = shift_reg[7];
+                    spi_vif.miso_drv[mon_number] = shift_reg[7];
                     if( spi_mode[1] == '0 )
                         @(posedge spi_vif.sck);
                     else
@@ -59,7 +59,7 @@ class spi_monitor #(parameter ss_width = 1);
                         @(posedge spi_vif.sck);
                     else
                         @(negedge spi_vif.sck);
-                    spi_vif.miso_drv[N] = shift_reg[7];
+                    spi_vif.miso_drv[mon_number] = shift_reg[7];
                     if( spi_mode[1] == '0 )
                         @(negedge spi_vif.sck);
                     else
@@ -68,9 +68,9 @@ class spi_monitor #(parameter ss_width = 1);
                 end
             end
             mon_rx_data.push_back(shift_reg);
-            @(posedge spi_vif.ss[N]);
+            @(posedge spi_vif.ss[mon_number]);
             $display("%s receive data = 0x%h",name,shift_reg);
-            spi_vif.miso_drv[N] = 'x;
+            spi_vif.miso_drv[mon_number] = 'x;
         end
     endtask : run
 

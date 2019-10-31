@@ -25,23 +25,23 @@ class wb_random_gen;
     logic   [7 : 0]     sper;
     logic   [7 : 0]     tr_data;
 
-    constraint spi_mode_{
+    constraint spi_mode_gen_rule{
         spi_mode inside { [0 : 3] };
     }
 
-    constraint spi_clk_div_{
+    constraint spi_clk_div_gen_rule{
         spi_clk_div inside { [0:11] };
     }
 
-    constraint spi_tr_data_{
+    constraint spi_tr_data_gen_rule{
         spi_tr_data inside { [0:255] };
     }
 
-    constraint spi_slave_n_{
+    constraint spi_slave_n_gen_rule{
         spi_slave_n inside { [0:num_spi_slaves-1] };
     }
 
-    constraint spi_ie_{
+    constraint spi_ie_gen_rule{
         spi_ie inside { ['0:'1] };
     }
 

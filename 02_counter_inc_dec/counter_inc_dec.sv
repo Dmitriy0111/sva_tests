@@ -16,35 +16,47 @@ module counter_inc_dec
     output  logic   [7 : 0]     cnt
 );
 
+    logic   [7 : 0]     count;
+    
+    assign cnt = count;
+
     always_ff @(posedge clk, negedge rst_n)
         if( !rst_n )
-            cnt <= '0;
+            count <= '0;
         else
-            cnt <= cnt + ( ( inc == '1 ) ? 1'b1 : '0 ) + ( ( dec == '1 ) ? - 1'b1 : '0 );
+            count <= count + ( ( inc == '1 ) ? 1'b1 : '0 ) + ( ( dec == '1 ) ? - 1'b1 : '0 );
 
-    property inc_p;
+    property inc_test_p;
         @(posedge clk)
         disable iff(!rst_n)
-            ( inc && !dec ) |-> ##1 ( cnt != ( ( $past(cnt) == 8'hFF ) ? $past(cnt) + 1 : 8'h00 ) );
-    endproperty : inc_p
+        ( inc && !dec ) |=> ( count != ( ( $past(count) == 8'hFF ) ? $past(count) + 1 : 8'h00 ) );
+    endproperty : inc_test_p
 
-    property dec_p;
+    property dec_test_p;
         @(posedge clk)
         disable iff(!rst_n)
-            ( dec && !inc ) |-> ##1 ( cnt != ( ( $past(cnt) == 8'h00 ) ? $past(cnt) - 1 : 8'hFF ) );
-    endproperty : dec_p
+        ( dec && !inc ) |=> ( count != ( ( $past(count) == 8'h00 ) ? $past(count) - 1 : 8'hFF ) );
+    endproperty : dec_test_p
 
-    property unk_p;
+    property unk_test_p(test_v);
         @(posedge clk)
         disable iff(!rst_n)
-        !$isunknown(cnt);
-    endproperty : unk_p
+        !$isunknown(test_v);
+    endproperty : unk_test_p
 
-    inc_a : assert property(inc_p) else $display("Inc : Fail at time %tns",$time());
-    inc_c : cover  property(inc_p)      ;// $display("Inc : Pass at time %tns",$time());
-    dec_a : assert property(dec_p) else $display("dec : Fail at time %tns",$time());
-    dec_c : cover  property(dec_p)      ;// $display("dec : Pass at time %tns",$time());
-    unk_a : assert property(unk_p) else $display("Unk : Fail at time %tns",$time());
-    unk_c : cover  property(unk_p)      ;// $display("Unk : Pass at time %tns",$time());
+    property hold_test_p(test_v);
+        @(posedge clk)
+        disable iff(!rst_n)
+        ( !dec && !inc ) |=> $stable(test_v);
+    endproperty : hold_test_p
 
+    inc_a   : assert property( inc_test_p           ) else $warning("inc_a : FAIL");
+    inc_c   : cover  property( inc_test_p           )      ;// $info("inc_c : PASS");
+    dec_a   : assert property( dec_test_p           ) else $warning("dec_a : FAIL");
+    dec_c   : cover  property( dec_test_p           )      ;// $info("dec_c : PASS");
+    unk_a   : assert property( unk_test_p( count )  ) else $warning("unk_a : FAIL");
+    unk_c   : cover  property( unk_test_p( count )  )      ;// $info("unk_c : PASS");
+    hold_a  : assert property( hold_test_p( count ) ) else $warning("hold_a : FAIL");
+    hold_c  : cover  property( hold_test_p( count ) )      ;// $info("hold_c : PASS");
+    
 endmodule : counter_inc_dec

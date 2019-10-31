@@ -9,28 +9,18 @@ add wave /uart_transmitter_tb/uart_transmitter_dut/*
 add wave -divider "DUT assertions"
 add wave /uart_transmitter_tb/uart_transmitter_dut/idle2start_a
 add wave /uart_transmitter_tb/uart_transmitter_dut/idle2start_c
-add wave /uart_transmitter_tb/uart_transmitter_dut/idle_change_a
-add wave /uart_transmitter_tb/uart_transmitter_dut/idle_change_c
 
 add wave /uart_transmitter_tb/uart_transmitter_dut/start2tr_a
 add wave /uart_transmitter_tb/uart_transmitter_dut/start2tr_c
-add wave /uart_transmitter_tb/uart_transmitter_dut/start_change_a
-add wave /uart_transmitter_tb/uart_transmitter_dut/start_change_c
 
 add wave /uart_transmitter_tb/uart_transmitter_dut/tr2stop_a
 add wave /uart_transmitter_tb/uart_transmitter_dut/tr2stop_c
-add wave /uart_transmitter_tb/uart_transmitter_dut/tr_change_a
-add wave /uart_transmitter_tb/uart_transmitter_dut/tr_change_c
 
 add wave /uart_transmitter_tb/uart_transmitter_dut/stop2wait_a
 add wave /uart_transmitter_tb/uart_transmitter_dut/stop2wait_c
-add wave /uart_transmitter_tb/uart_transmitter_dut/stop_change_a
-add wave /uart_transmitter_tb/uart_transmitter_dut/stop_change_c
 
 add wave /uart_transmitter_tb/uart_transmitter_dut/wait2idle_a
 add wave /uart_transmitter_tb/uart_transmitter_dut/wait2idle_c
-add wave /uart_transmitter_tb/uart_transmitter_dut/wait_change_a
-add wave /uart_transmitter_tb/uart_transmitter_dut/wait_change_c
 
 add wave /uart_transmitter_tb/uart_transmitter_dut/unk_tx_data_int_a
 add wave /uart_transmitter_tb/uart_transmitter_dut/unk_tx_data_int_c

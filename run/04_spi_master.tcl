@@ -52,18 +52,6 @@ add wave /spi_master_tb/spi_master_dut/unk_cpha_int_c
 add wave /spi_master_tb/spi_master_dut/unk_comp_int_a
 add wave /spi_master_tb/spi_master_dut/unk_comp_int_c
 
-add wave /spi_master_tb/spi_master_dut/idle_change_a
-add wave /spi_master_tb/spi_master_dut/idle_change_c
-
-add wave /spi_master_tb/spi_master_dut/transmit_change_a
-add wave /spi_master_tb/spi_master_dut/transmit_change_c
-
-add wave /spi_master_tb/spi_master_dut/post_tr_change_a
-add wave /spi_master_tb/spi_master_dut/post_tr_change_c
-
-add wave /spi_master_tb/spi_master_dut/wait_change_a
-add wave /spi_master_tb/spi_master_dut/wait_change_c
-
 add wave /spi_master_tb/spi_master_dut/idle2tr_a
 add wave /spi_master_tb/spi_master_dut/idle2tr_c
 

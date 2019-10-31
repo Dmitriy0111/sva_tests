@@ -41,9 +41,9 @@ module simple_spi_pm
     ///////////////////////////////////////////////////////////////////////////////////////////
     //                                       Properties                                      //
     ///////////////////////////////////////////////////////////////////////////////////////////
-    property rst_test(test_v,rst_cond,comp_v);
+    property rst_test_p(test_v,rst_cond,comp_v);
         @(posedge clk_i) ( rst_cond ) |=> ( test_v == comp_v );
-    endproperty : rst_test
+    endproperty : rst_test_p
 
     property test_clock_div_p;
         @(posedge clk_i)
@@ -64,62 +64,62 @@ module simple_spi_pm
         else                                   ( '0                                            )
     endproperty : test_clock_div_p
 
-    property state_change(c_state,cond,n_state);
+    property state_change_p(c_state,cond,n_state);
         @(posedge clk_i)
         disable iff( rst_i )
         ( ( state == c_state ) && ( cond ) ) |=> ( state == n_state );
-    endproperty : state_change
+    endproperty : state_change_p
     
     ///////////////////////////////////////////////////////////////////////////////////////////
     //                                  Assertions and covers                                //
     ///////////////////////////////////////////////////////////////////////////////////////////
     // check reset conditions
-    rst_spcr_a      : assert property( rst_test( spcr  , rst_i        , 8'h10 ) ) else $warning("rst_spcr_a : FAIL");
-    rst_spcr_c      : cover  property( rst_test( spcr  , rst_i        , 8'h10 ) )      ;// $info("rst_spcr_c : PASS");
+    rst_spcr_a      : assert property( rst_test_p( spcr  , rst_i        , 8'h10 )   ) else $warning("rst_spcr_a : FAIL");
+    rst_spcr_c      : cover  property( rst_test_p( spcr  , rst_i        , 8'h10 )   )      ;// $info("rst_spcr_c : PASS");
 
-    rst_sper_a      : assert property( rst_test( sper  , rst_i        , 8'h00 ) ) else $warning("rst_sper_a : FAIL");
-    rst_sper_c      : cover  property( rst_test( sper  , rst_i        , 8'h00 ) )      ;// $info("rst_sper_c : PASS");
+    rst_sper_a      : assert property( rst_test_p( sper  , rst_i        , 8'h00 )   ) else $warning("rst_sper_a : FAIL");
+    rst_sper_c      : cover  property( rst_test_p( sper  , rst_i        , 8'h00 )   )      ;// $info("rst_sper_c : PASS");
 
-    rst_ss_r_a      : assert property( rst_test( ss_r  , rst_i        , '0    ) ) else $warning("rst_ss_r_a : FAIL");
-    rst_ss_r_c      : cover  property( rst_test( ss_r  , rst_i        , '0    ) )      ;// $info("rst_ss_r_c : PASS");
+    rst_ss_r_a      : assert property( rst_test_p( ss_r  , rst_i        , '0    )   ) else $warning("rst_ss_r_a : FAIL");
+    rst_ss_r_c      : cover  property( rst_test_p( ss_r  , rst_i        , '0    )   )      ;// $info("rst_ss_r_c : PASS");
 
-    rst_spif_a      : assert property( rst_test( spif  , ~spe | rst_i , '0    ) ) else $warning("rst_spif_a : FAIL");
-    rst_spif_c      : cover  property( rst_test( spif  , ~spe | rst_i , '0    ) )      ;// $info("rst_spif_c : PASS");
+    rst_spif_a      : assert property( rst_test_p( spif  , ~spe | rst_i , '0    )   ) else $warning("rst_spif_a : FAIL");
+    rst_spif_c      : cover  property( rst_test_p( spif  , ~spe | rst_i , '0    )   )      ;// $info("rst_spif_c : PASS");
 
-    rst_wcol_a      : assert property( rst_test( wcol  , ~spe | rst_i , '0    ) ) else $warning("rst_wcol_a : FAIL");
-    rst_wcol_c      : cover  property( rst_test( wcol  , ~spe | rst_i , '0    ) )      ;// $info("rst_wcol_c : PASS");
+    rst_wcol_a      : assert property( rst_test_p( wcol  , ~spe | rst_i , '0    )   ) else $warning("rst_wcol_a : FAIL");
+    rst_wcol_c      : cover  property( rst_test_p( wcol  , ~spe | rst_i , '0    )   )      ;// $info("rst_wcol_c : PASS");
 
-    rst_state_a     : assert property( rst_test( state , ~spe | rst_i , '0    ) ) else $warning("rst_state_a : FAIL");
-    rst_state_c     : cover  property( rst_test( state , ~spe | rst_i , '0    ) )      ;// $info("rst_state_c : PASS");
+    rst_state_a     : assert property( rst_test_p( state , ~spe | rst_i , '0    )   ) else $warning("rst_state_a : FAIL");
+    rst_state_c     : cover  property( rst_test_p( state , ~spe | rst_i , '0    )   )      ;// $info("rst_state_c : PASS");
 
-    rst_bcnt_a      : assert property( rst_test( bcnt  , ~spe | rst_i , '0    ) ) else $warning("rst_bcnt_a : FAIL");
-    rst_bcnt_c      : cover  property( rst_test( bcnt  , ~spe | rst_i , '0    ) )      ;// $info("rst_bcnt_c : PASS");
+    rst_bcnt_a      : assert property( rst_test_p( bcnt  , ~spe | rst_i , '0    )   ) else $warning("rst_bcnt_a : FAIL");
+    rst_bcnt_c      : cover  property( rst_test_p( bcnt  , ~spe | rst_i , '0    )   )      ;// $info("rst_bcnt_c : PASS");
 
-    rst_treg_a      : assert property( rst_test( treg  , ~spe | rst_i , '0    ) ) else $warning("rst_treg_a : FAIL");
-    rst_treg_c      : cover  property( rst_test( treg  , ~spe | rst_i , '0    ) )      ;// $info("rst_treg_c : PASS");
+    rst_treg_a      : assert property( rst_test_p( treg  , ~spe | rst_i , '0    )   ) else $warning("rst_treg_a : FAIL");
+    rst_treg_c      : cover  property( rst_test_p( treg  , ~spe | rst_i , '0    )   )      ;// $info("rst_treg_c : PASS");
 
-    rst_wfre_a      : assert property( rst_test( wfre  , ~spe | rst_i , '0    ) ) else $warning("rst_wfre_a : FAIL");
-    rst_wfre_c      : cover  property( rst_test( wfre  , ~spe | rst_i , '0    ) )      ;// $info("rst_wfre_c : PASS");
+    rst_wfre_a      : assert property( rst_test_p( wfre  , ~spe | rst_i , '0    )   ) else $warning("rst_wfre_a : FAIL");
+    rst_wfre_c      : cover  property( rst_test_p( wfre  , ~spe | rst_i , '0    )   )      ;// $info("rst_wfre_c : PASS");
 
-    rst_rfwe_a      : assert property( rst_test( rfwe  , ~spe | rst_i , '0    ) ) else $warning("rst_rfwe_a : FAIL");
-    rst_rfwe_c      : cover  property( rst_test( rfwe  , ~spe | rst_i , '0    ) )      ;// $info("rst_rfwe_c : PASS");
+    rst_rfwe_a      : assert property( rst_test_p( rfwe  , ~spe | rst_i , '0    )   ) else $warning("rst_rfwe_a : FAIL");
+    rst_rfwe_c      : cover  property( rst_test_p( rfwe  , ~spe | rst_i , '0    )   )      ;// $info("rst_rfwe_c : PASS");
 
-    rst_sck_o_a     : assert property( rst_test( sck_o , ~spe | rst_i , '0    ) ) else $warning("rst_sck_o_a : FAIL");
-    rst_sck_o_c     : cover  property( rst_test( sck_o , ~spe | rst_i , '0    ) )      ;// $info("rst_sck_o_c : PASS");
+    rst_sck_o_a     : assert property( rst_test_p( sck_o , ~spe | rst_i , '0    )   ) else $warning("rst_sck_o_a : FAIL");
+    rst_sck_o_c     : cover  property( rst_test_p( sck_o , ~spe | rst_i , '0    )   )      ;// $info("rst_sck_o_c : PASS");
     // check clock div
     test_clock_div_a    : assert property( test_clock_div_p ) else $warning("test_clock_div_a : FAIL");
     test_clock_div_c    : cover  property( test_clock_div_p )      ;// $info("test_clock_div_c : PASS");
     // check FSM
-    idle2clk_ph2_a      : assert property( state_change( 2'b00 , ~wfempty           , 2'b01 ) ) else $warning("idle2clk_ph2_a : FAIL");
-    idle2clk_ph2_c      : cover  property( state_change( 2'b00 , ~wfempty           , 2'b01 ) )      ;// $info("idle2clk_ph2_c : PASS");
+    idle2clk_ph2_a      : assert property( state_change_p( 2'b00 , ~wfempty           , 2'b01 ) ) else $warning("idle2clk_ph2_a : FAIL");
+    idle2clk_ph2_c      : cover  property( state_change_p( 2'b00 , ~wfempty           , 2'b01 ) )      ;// $info("idle2clk_ph2_c : PASS");
 
-    clk_ph2_2clk_ph1_a  : assert property( state_change( 2'b01 , ena                , 2'b11 ) ) else $warning("clk_ph2_2clk_ph1_a : FAIL");
-    clk_ph2_2clk_ph1_c  : cover  property( state_change( 2'b01 , ena                , 2'b11 ) )      ;// $info("clk_ph2_2clk_ph1_c : PASS");
+    clk_ph2_2clk_ph1_a  : assert property( state_change_p( 2'b01 , ena                , 2'b11 ) ) else $warning("clk_ph2_2clk_ph1_a : FAIL");
+    clk_ph2_2clk_ph1_c  : cover  property( state_change_p( 2'b01 , ena                , 2'b11 ) )      ;// $info("clk_ph2_2clk_ph1_c : PASS");
 
-    clk_ph1_2idle_a     : assert property( state_change( 2'b11 , ena && ( ~|bcnt )  , 2'b00 ) ) else $warning("clk_ph1_2idle_a : FAIL");
-    clk_ph1_2idle_c     : cover  property( state_change( 2'b11 , ena && ( ~|bcnt )  , 2'b00 ) )      ;// $info("clk_ph1_2idle_c : PASS");
+    clk_ph1_2idle_a     : assert property( state_change_p( 2'b11 , ena && ( ~|bcnt )  , 2'b00 ) ) else $warning("clk_ph1_2idle_a : FAIL");
+    clk_ph1_2idle_c     : cover  property( state_change_p( 2'b11 , ena && ( ~|bcnt )  , 2'b00 ) )      ;// $info("clk_ph1_2idle_c : PASS");
 
-    clk_ph1_2clk_ph2_a  : assert property( state_change( 2'b11 , ena && !( ~|bcnt ) , 2'b01 ) ) else $warning("clk_ph1_2clk_ph2_a : FAIL");
-    clk_ph1_2clk_ph2_c  : cover  property( state_change( 2'b11 , ena && !( ~|bcnt ) , 2'b01 ) )      ;// $info("clk_ph1_2clk_ph2_c : PASS");
+    clk_ph1_2clk_ph2_a  : assert property( state_change_p( 2'b11 , ena && !( ~|bcnt ) , 2'b01 ) ) else $warning("clk_ph1_2clk_ph2_a : FAIL");
+    clk_ph1_2clk_ph2_c  : cover  property( state_change_p( 2'b11 , ena && !( ~|bcnt ) , 2'b01 ) )      ;// $info("clk_ph1_2clk_ph2_c : PASS");
 
 endmodule : simple_spi_pm
