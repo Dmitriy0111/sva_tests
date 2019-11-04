@@ -49,19 +49,19 @@ module simple_spi_pm
         @(posedge clk_i)
         disable iff( rst_i )
         ( ( state == 2'b00 ) && ( ~wfempty ) ) |->
-        if      ( espr == 4'b0000            ) ( ##[8*2    -2 :    8*2 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 2   -- original M68HC11 coding
-        else if ( espr == 4'b0001            ) ( ##[8*4    -2 :    8*4 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 4   -- original M68HC11 coding
-        else if ( espr == 4'b0010            ) ( ##[8*16   -2 :   8*16 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 16  -- original M68HC11 coding
-        else if ( espr == 4'b0011            ) ( ##[8*32   -2 :   8*32 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 32  -- original M68HC11 coding
-        else if ( espr == 4'b0100            ) ( ##[8*8    -2 :    8*8 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 8
-        else if ( espr == 4'b0101            ) ( ##[8*64   -2 :   8*64 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 64
-        else if ( espr == 4'b0110            ) ( ##[8*128  -2 :  8*128 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 128
-        else if ( espr == 4'b0111            ) ( ##[8*256  -2 :  8*256 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 256
-        else if ( espr == 4'b1000            ) ( ##[8*512  -2 :  8*512 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 512
-        else if ( espr == 4'b1001            ) ( ##[8*1024 -2 : 8*1024 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 1024
-        else if ( espr == 4'b1010            ) ( ##[8*2048 -2 : 8*2048 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 2048
-        else if ( espr == 4'b1011            ) ( ##[8*4096 -2 : 8*4096 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 4096
-        else                                   ( '0                                            )
+        if      ( espr == 4'b0000   ) ( ##[8*2    -2 :    8*2 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 2   -- original M68HC11 coding
+        else if ( espr == 4'b0001   ) ( ##[8*4    -2 :    8*4 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 4   -- original M68HC11 coding
+        else if ( espr == 4'b0010   ) ( ##[8*16   -2 :   8*16 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 16  -- original M68HC11 coding
+        else if ( espr == 4'b0011   ) ( ##[8*32   -2 :   8*32 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 32  -- original M68HC11 coding
+        else if ( espr == 4'b0100   ) ( ##[8*8    -2 :    8*8 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 8
+        else if ( espr == 4'b0101   ) ( ##[8*64   -2 :   8*64 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 64
+        else if ( espr == 4'b0110   ) ( ##[8*128  -2 :  8*128 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 128
+        else if ( espr == 4'b0111   ) ( ##[8*256  -2 :  8*256 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 256
+        else if ( espr == 4'b1000   ) ( ##[8*512  -2 :  8*512 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 512
+        else if ( espr == 4'b1001   ) ( ##[8*1024 -2 : 8*1024 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 1024
+        else if ( espr == 4'b1010   ) ( ##[8*2048 -2 : 8*2048 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 2048
+        else if ( espr == 4'b1011   ) ( ##[8*4096 -2 : 8*4096 + 2] ( state == 2'b11 ) ##1 ( state == 2'b00 ) )    // div = 4096
+        else                          ( '0                                                                   )
     endproperty : test_clock_div_p
 
     property state_change_p(c_state,cond,n_state);
