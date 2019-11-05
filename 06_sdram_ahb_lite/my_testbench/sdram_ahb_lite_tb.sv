@@ -1,3 +1,11 @@
+/*
+*  File            :   sdram_ahb_lite_tb.sv
+*  Autor           :   Vlasov D.V.
+*  Data            :   2019.11.01
+*  Language        :   SystemVerilog
+*  Description     :   This is sdram ahb lite testbench
+*  Copyright(c)    :   2019 Vlasov D.V.
+*/
 
 import test_pkg::*;
 
@@ -17,10 +25,13 @@ module sdram_ahb_lite_tb();
     parameter       start_delay = 200,
                     repeat_c = 10000,
                     rst_delay = 7,
-                    T = 10;
+                    T = 20;
 
     logic   [0 : 0]     HCLK;
     logic   [0 : 0]     HRESETn;
+
+    sock_data               write_sock_data;
+    socket  #(sock_data)    write_sock = new(2);
 
     ahb_lite_if     
     ahb_lite_if_0
@@ -124,7 +135,33 @@ module sdram_ahb_lite_tb();
 
     initial
     begin
+        @(posedge HRESETn);
         ahb_driver_0.reset_signals();
+        ahb_driver_0.connect_write_sock(write_sock);
+        repeat(200) @(posedge HCLK);
+        ahb_driver_0.run();
+    end
+
+    initial
+    begin
+        @(posedge HRESETn);
+        repeat(400) @(posedge HCLK);
+        write_sock_data.addr = 32'h00000010;
+        write_sock_data.data = 32'hAA5555AA;
+        write_sock.send_msg(0, write_sock_data);
+        write_sock.wait_side(1);
+        write_sock_data.addr = 32'h00000014;
+        write_sock_data.data = 32'h55AAAA55;
+        write_sock.send_msg(0, write_sock_data);
+        write_sock.wait_side(1);
+        write_sock_data.addr = 32'h00000018;
+        write_sock_data.data = 32'hFFFFFFFF;
+        write_sock.send_msg(0, write_sock_data);
+        write_sock.wait_side(1);
+        write_sock_data.addr = 32'h0000001C;
+        write_sock_data.data = 32'hEEEE7777;
+        write_sock.send_msg(0, write_sock_data);
+        write_sock.wait_side(1);
     end
 
 endmodule : sdram_ahb_lite_tb

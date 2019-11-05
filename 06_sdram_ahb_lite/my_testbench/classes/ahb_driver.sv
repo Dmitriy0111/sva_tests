@@ -1,7 +1,7 @@
 /*
 *  File            :   ahb_driver.sv
 *  Autor           :   Vlasov D.V.
-*  Data            :   2019.01.01
+*  Data            :   2019.11.01
 *  Language        :   SystemVerilog
 *  Description     :   This is ahb driver
 *  Copyright(c)    :   2019 Vlasov D.V.
@@ -15,10 +15,40 @@ class ahb_driver;
     virtual ahb_lite_if     vif;
     string                  name;
 
+    sock_data               write_sock_data;
+    sock_data               read_sock_data;
+
+    socket  #(sock_data)    write_sock = new(2);
+    socket  #(sock_data)    read_sock = new(2);
+
+    logic   [31 : 0]        haddr_q [$];
+    logic   [31 : 0]        hdata_q [$];
+
+    /* 
+        ahb_slave signals
+                               --------------
+        HSEL        -[0  : 0]->| AHB slave  |
+        HADDR       -[31 : 0]->|            |
+        HWRITE      -[0  : 0]->|            |-[0  : 0]->HREADYOUT
+        HSIZE       -[2  : 0]->|            |-[0  : 0]->HRESP
+        HBURST      -[2  : 0]->|            |
+        HPROT       -[3  : 0]->|            |-[31 : 0]->HRDATA
+        HTRANS      -[1  : 0]->|            |
+        HMASTLOCK   -[0  : 0]->|            |
+        HREADY      -[0  : 0]->|            |
+                               |            |
+        HWDATA      -[31 : 0]->|            |
+                               --------------
+    */
+
     function new(string name, virtual ahb_lite_if vif);
         this.name = name;
         this.vif = vif;
     endfunction : new
+
+    task connect_write_sock(socket #(sock_data) write_sock);
+        this.write_sock = write_sock;
+    endtask : connect_write_sock
 
     task set_haddr(logic [31 : 0] value);
         vif.HADDR = value;
@@ -89,14 +119,42 @@ class ahb_driver;
         @(posedge vif.HCLK);
     endtask : wait_clk
 
-    task write_data(logic [31 : 0] w_addr, logic [31 : 0] w_data);
-        this.set_haddr(w_addr);
-        this.set_hwdata(w_data);
+    task addr_pipe();
+        write_sock.rec_msg(0, write_sock_data);
+        $info("%s write addr = 0x%h write data = 0x%h", name, write_sock_data.addr, write_sock_data.data);
+        this.set_haddr(write_sock_data.addr);
         this.set_hsel('1);
+        this.set_hwrite('1);
         this.set_hsize(3'b010);
-        this.wait_clk();
-        
-    endtask : write_data
+        this.set_htrans(2'b10);
+        this.set_hready('1);
+        do
+        begin
+            this.wait_clk();
+        end
+        while( vif.HREADYOUT != '1 );
+        this.set_hready('0);
+        write_sock.trig_side(1);
+    endtask : addr_pipe
+
+    task data_pipe();
+        this.set_hwdata(write_sock_data.data);
+        do
+        begin
+            this.wait_clk();
+        end
+        while( vif.HREADYOUT != '1 );
+    endtask : data_pipe
+
+    task run();
+        forever
+        begin
+            addr_pipe();
+            fork
+                data_pipe();
+            join_none
+        end
+    endtask : run
 
 endclass : ahb_driver
 
