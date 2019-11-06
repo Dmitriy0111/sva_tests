@@ -10,9 +10,14 @@ vlog -sv ../06_sdram_ahb_lite/my_testbench/test_pkg.*v
 # compile testbench
 vlog -sv ../06_sdram_ahb_lite/my_testbench/*_tb.*v
 
-vsim -novopt work.sdram_ahb_lite_tb
+vsim -novopt work.sdram_ahb_lite_tb +TEST=RAND_TEST
 
 add wave -divider "DUT signals"
 add wave -position insertpoint sim:/sdram_ahb_lite_tb/ahb_lite_sdram_0/*
 
 run -all
+
+mem save -o bank0.mem -f hex /sdram_ahb_lite_tb/sdram0/Bank0
+mem save -o bank1.mem -f hex /sdram_ahb_lite_tb/sdram0/Bank1
+mem save -o bank2.mem -f hex /sdram_ahb_lite_tb/sdram0/Bank2
+mem save -o bank3.mem -f hex /sdram_ahb_lite_tb/sdram0/Bank3

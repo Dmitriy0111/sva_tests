@@ -15,7 +15,7 @@
 module simple_spi_tb();
 
     parameter           T = 10,
-                        repeat_n = 2000,
+                        repeat_n = 100,
                         rst_delay = 7,
                         start_delay = 200;
 
@@ -149,11 +149,12 @@ module simple_spi_tb();
             wb_driver_0.write_data(3'b100, wb_random_gen_0.ss_sel  );
             wb_driver_0.write_data(3'b010, wb_random_gen_0.tr_data );
             if( !spi_ie )
-            do
-            begin
-                wb_driver_0.read_data(3'b001,r_data_wb);
-            end
-            while( ( r_data_wb & 8'h80 ) == 0 );
+                for(;;)
+                begin
+                    wb_driver_0.read_data(3'b001,r_data_wb);
+                    if( ( r_data_wb & 8'h80 ) != 0 )
+                        break;
+                end
             else
                 @(posedge inta_o);
             wb_driver_0.read_data(3'b001,r_data_wb);

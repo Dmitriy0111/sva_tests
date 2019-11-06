@@ -1,0 +1,66 @@
+/*
+*  File            :   direct_gen.sv
+*  Autor           :   Vlasov D.V.
+*  Data            :   2019.11.06
+*  Language        :   SystemVerilog
+*  Description     :   This is direct test generator
+*  Copyright(c)    :   2019 Vlasov D.V.
+*/
+
+`ifndef DIRECT_GEN__SV
+`define DIRECT_GEN__SV
+
+class direct_gen extends base_gen;
+
+    int     file_p = 0;
+
+    extern function     new(string name, virtual ahb_lite_if vif);
+    extern task         run();
+    extern function bit pars_file();
+
+endclass : direct_gen
+
+function direct_gen::new(string name, virtual ahb_lite_if vif);
+    super.new(name, vif);
+    file_p = $fopen("../06_sdram_ahb_lite/my_testbench/direct_test.txt","r");
+    if( file_p == 0 )
+    begin
+        $display("Direct test file not open!");
+        $stop;
+    end
+endfunction : new
+
+task direct_gen::run();
+    @(posedge vif.HRESETn);
+    repeat(200) @(posedge vif.HCLK);
+    
+    for(;;)
+    begin
+        if( !pars_file() )
+            break;
+        rand_ahb_trans.print();
+        if( rand_ahb_trans.wr_rd == '1 )
+            gen2drv.send_msg(0, rand_ahb_trans);
+        gen2drv.wait_side(1);
+    end
+endtask : run
+
+// N addr data wr_rd size
+function bit direct_gen::pars_file();
+    logic   [31 : 0]    addr;
+    logic   [31 : 0]    data;
+    string              wr_rd;
+    string              size;
+    int                 N;
+    if( $fscanf(file_p,"%d %h %h %s %s",N,addr,data,wr_rd,size) == -1 )
+        return '0;
+    rand_ahb_trans.addr = addr;
+    rand_ahb_trans.data = data;
+    rand_ahb_trans.N    = N;
+    rand_ahb_trans.size = ( size == "WORD"  ? 3'b010 : 
+                            size == "HWORD" ? 3'b001 : 3'b010 );
+    rand_ahb_trans.wr_rd = ( wr_rd == "WRITE"  ? '1 : '0 );
+    return '1;
+endfunction : pars_file
+
+`endif // DIRECT_GEN__SV

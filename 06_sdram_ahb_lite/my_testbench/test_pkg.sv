@@ -9,14 +9,14 @@
 
 package test_pkg;
 
-    typedef struct
-    {
-        logic   [31 : 0]    addr;
-        logic   [31 : 0]    data;
-        logic   [0  : 0]    op;
-    } sock_data;
-
+    `include    "classes/ahb_trans.sv"
     `include    "classes/socket.sv"
     `include    "classes/ahb_driver.sv"
+    `include    "classes/base_gen.sv"
+    `include    "classes/random_gen.sv"
+    `include    "classes/direct_gen.sv"
 
+    `include    "classes/rand_test.sv"
+    `include    "classes/direct_test.sv"
+    
 endpackage : test_pkg

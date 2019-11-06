@@ -30,9 +30,6 @@ module sdram_ahb_lite_tb();
     logic   [0 : 0]     HCLK;
     logic   [0 : 0]     HRESETn;
 
-    sock_data               write_sock_data;
-    socket  #(sock_data)    write_sock = new(2);
-
     ahb_lite_if     
     ahb_lite_if_0
     (
@@ -105,9 +102,6 @@ module sdram_ahb_lite_tb();
         .Dqm        ( sdram_if_0.dqm            )
     );
 
-    ahb_driver
-    ahb_driver_0 = new("AHB_DRIVER", ahb_lite_if_0);
-
     assign #(5) sdram_if_0.clk = HCLK;
 
     initial
@@ -135,33 +129,25 @@ module sdram_ahb_lite_tb();
 
     initial
     begin
-        @(posedge HRESETn);
-        ahb_driver_0.reset_signals();
-        ahb_driver_0.connect_write_sock(write_sock);
-        repeat(200) @(posedge HCLK);
-        ahb_driver_0.run();
-    end
-
-    initial
-    begin
-        @(posedge HRESETn);
-        repeat(400) @(posedge HCLK);
-        write_sock_data.addr = 32'h00000010;
-        write_sock_data.data = 32'hAA5555AA;
-        write_sock.send_msg(0, write_sock_data);
-        write_sock.wait_side(1);
-        write_sock_data.addr = 32'h00000014;
-        write_sock_data.data = 32'h55AAAA55;
-        write_sock.send_msg(0, write_sock_data);
-        write_sock.wait_side(1);
-        write_sock_data.addr = 32'h00000018;
-        write_sock_data.data = 32'hFFFFFFFF;
-        write_sock.send_msg(0, write_sock_data);
-        write_sock.wait_side(1);
-        write_sock_data.addr = 32'h0000001C;
-        write_sock_data.data = 32'hEEEE7777;
-        write_sock.send_msg(0, write_sock_data);
-        write_sock.wait_side(1);
+        string test_name;
+        $value$plusargs("TEST=%s",test_name);
+        $display("TEST_NAME = %s", test_name);
+        if( test_name == "RAND_TEST" )
+        begin
+            rand_test test_0;
+            test_0 = new("RAND_TEST",ahb_lite_if_0);
+            test_0.connect();
+            test_0.run();
+        end
+        else if( test_name == "DIRECT_TEST" )
+        begin
+            direct_test test_0;
+            test_0 = new("DIRECT_TEST",ahb_lite_if_0);
+            test_0.connect();
+            test_0.run();
+        end
+        else
+            $fatal();
     end
 
 endmodule : sdram_ahb_lite_tb

@@ -54,25 +54,28 @@ class spi_simple_cover;
 
     endgroup : spi_simple_cg
 
-    function new(virtual wb_if wb_vif);
-        this.wb_vif = wb_vif;
-        spi_simple_cg = new();
-    endfunction : new
-
-    task run();
-        @(posedge wb_vif.RST);
-        forever
-        begin
-            @(posedge wb_vif.CLK);
-            if( &{ wb_vif.WE , wb_vif.STB , wb_vif.CYC } )
-            case( wb_vif.ADR )
-                3'b000  : spcr = wb_vif.DATA_O;
-                3'b011  : sper = wb_vif.DATA_O;
-                3'b010  : spi_simple_cg.sample();
-            endcase
-        end
-    endtask : run
+    extern function new(virtual wb_if wb_vif);
+    extern task     run();
 
 endclass : spi_simple_cover
+
+function spi_simple_cover::new(virtual wb_if wb_vif);
+    this.wb_vif = wb_vif;
+    spi_simple_cg = new();
+endfunction : new
+
+task spi_simple_cover::run();
+    @(posedge wb_vif.RST);
+    forever
+    begin
+        @(posedge wb_vif.CLK);
+        if( &{ wb_vif.WE , wb_vif.STB , wb_vif.CYC } )
+        case( wb_vif.ADR )
+            3'b000  : spcr = wb_vif.DATA_O;
+            3'b011  : sper = wb_vif.DATA_O;
+            3'b010  : spi_simple_cg.sample();
+        endcase
+    end
+endtask : run
 
 `endif // SPI_SIMPLE_COVER__SV
