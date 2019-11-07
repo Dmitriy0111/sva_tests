@@ -15,7 +15,7 @@ class base_gen;
     virtual ahb_lite_if     vif;
     string                  name;
 
-    ahb_trans               rand_ahb_trans = new();
+    ahb_trans               ahb_tr = new();
 
     socket  #(ahb_trans)    gen2drv = new(2);
 

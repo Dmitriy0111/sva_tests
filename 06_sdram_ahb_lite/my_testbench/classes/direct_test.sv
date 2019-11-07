@@ -10,11 +10,15 @@
 `ifndef DIRECT_TEST__SV
 `define DIRECT_TEST__SV
 
-class direct_test;
+class direct_test extends base_test;
 
-    ahb_driver                  ahb_driver_0;
-    direct_gen                  direct_gen_0;
+    ahb_driver                  ahb_drv;
+    direct_gen                  direct_gen;
+    ahb_monitor                 ahb_mon;
+    ahb_coverage                ahb_cov;
+
     socket      #(ahb_trans)    gen2drv = new(2);
+    socket      #(ahb_trans)    mon2cov = new(1);
 
     extern function new(name = "", virtual ahb_lite_if ahb_vif);
     extern task     connect();
@@ -23,20 +27,27 @@ class direct_test;
 endclass : direct_test
 
 function direct_test::new(name = "", virtual ahb_lite_if ahb_vif);
-    ahb_driver_0 = new("AHB_DRIVER", ahb_vif);
-    direct_gen_0 = new("DIRECT_GEN", ahb_vif);
+    ahb_drv    = new("AHB_DRV"    , ahb_vif);
+    direct_gen = new("DIRECT_GEN" , ahb_vif);
+    ahb_mon    = new("AHB_MON"    , ahb_vif);
+    ahb_cov    = new("AHB_COV"    , ahb_vif);
 endfunction : new
 
 task direct_test::connect();
-    ahb_driver_0.gen2drv.connect(gen2drv);
-    direct_gen_0.gen2drv.connect(gen2drv);
+    ahb_drv.gen2drv.connect(gen2drv);
+    direct_gen.gen2drv.connect(gen2drv);
+
+    ahb_mon.mon2cov.connect(mon2cov);
+    ahb_cov.mon2cov.connect(mon2cov);
 endtask : connect
 
 task direct_test::run();
     fork
-        ahb_driver_0.run();
-        direct_gen_0.run();
-    join
+        ahb_drv.run();
+        direct_gen.run();
+        ahb_mon.run();
+        ahb_cov.run();
+    join_none
 endtask : run
 
 `endif // DIRECT_TEST__SV

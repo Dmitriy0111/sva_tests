@@ -134,7 +134,7 @@ endtask : wait_clk
 
 task ahb_driver::addr_pipe();
     gen2drv.rec_msg(0, ahb_trans_0);
-    $info("%s write addr = 0x%h write data = 0x%h", name, ahb_trans_0.addr, ahb_trans_0.data);
+    $info( { this.name , ahb_trans_0.to_str() } );
     this.set_haddr(ahb_trans_0.addr);
     this.set_hsel('1);
     this.set_hwrite(ahb_trans_0.wr_rd);

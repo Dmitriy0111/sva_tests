@@ -25,11 +25,10 @@ task random_gen::run();
     @(posedge vif.HRESETn);
     repeat(200) @(posedge vif.HCLK);
     
-    repeat(20)
+    repeat(200)
     begin
-        rand_ahb_trans.make_tr();
-        rand_ahb_trans.print();
-        gen2drv.send_msg(0, rand_ahb_trans);
+        ahb_tr.make_tr();
+        gen2drv.send_msg(0, ahb_tr);
         gen2drv.wait_side(1);
     end
 endtask : run

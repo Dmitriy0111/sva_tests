@@ -38,9 +38,8 @@ task direct_gen::run();
     begin
         if( !pars_file() )
             break;
-        rand_ahb_trans.print();
-        if( rand_ahb_trans.wr_rd == '1 )
-            gen2drv.send_msg(0, rand_ahb_trans);
+        if( ahb_tr.wr_rd == '1 )
+            gen2drv.send_msg(0, ahb_tr);
         gen2drv.wait_side(1);
     end
 endtask : run
@@ -54,12 +53,13 @@ function bit direct_gen::pars_file();
     int                 N;
     if( $fscanf(file_p,"%d %h %h %s %s",N,addr,data,wr_rd,size) == -1 )
         return '0;
-    rand_ahb_trans.addr = addr;
-    rand_ahb_trans.data = data;
-    rand_ahb_trans.N    = N;
-    rand_ahb_trans.size = ( size == "WORD"  ? 3'b010 : 
-                            size == "HWORD" ? 3'b001 : 3'b010 );
-    rand_ahb_trans.wr_rd = ( wr_rd == "WRITE"  ? '1 : '0 );
+    ahb_tr.addr = addr;
+    ahb_tr.data = data;
+    ahb_tr.N    = N;
+    ahb_tr.size = ( size == "WORD"  ? 3'b010 : 
+                    size == "HWORD" ? 3'b001 :
+                    size == "BYTE"  ? 3'b000 : 3'b010 );
+    ahb_tr.wr_rd = ( wr_rd == "WRITE"  ? '1 : '0 );
     return '1;
 endfunction : pars_file
 

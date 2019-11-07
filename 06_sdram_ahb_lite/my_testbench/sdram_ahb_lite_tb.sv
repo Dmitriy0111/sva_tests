@@ -130,24 +130,23 @@ module sdram_ahb_lite_tb();
     initial
     begin
         string test_name;
+        base_test test_0;
         $value$plusargs("TEST=%s",test_name);
         $display("TEST_NAME = %s", test_name);
         if( test_name == "RAND_TEST" )
         begin
-            rand_test test_0;
-            test_0 = new("RAND_TEST",ahb_lite_if_0);
-            test_0.connect();
-            test_0.run();
+            rand_test rand_test_0 = new("RAND_TEST",ahb_lite_if_0);
+            test_0 = rand_test_0;
         end
         else if( test_name == "DIRECT_TEST" )
         begin
-            direct_test test_0;
-            test_0 = new("DIRECT_TEST",ahb_lite_if_0);
-            test_0.connect();
-            test_0.run();
+            direct_test direct_test_0 = new("DIRECT_TEST",ahb_lite_if_0);
+            test_0 = direct_test_0;
         end
         else
             $fatal();
+        test_0.connect();
+        test_0.run();
     end
 
 endmodule : sdram_ahb_lite_tb
