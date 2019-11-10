@@ -41,6 +41,7 @@ class ahb_trans;
     extern function string to_str();
     extern task            print();
     extern task            make_tr();
+    extern task            copy(ahb_trans other_ahb_trans);
 
 endclass : ahb_trans
 
@@ -63,5 +64,14 @@ task ahb_trans::make_tr();
         $fatal("randomization error!");
     N++;
 endtask : make_tr
+
+task ahb_trans::copy(ahb_trans other_ahb_trans);
+    this.name = other_ahb_trans.name;
+    this.addr = other_ahb_trans.addr;
+    this.data = other_ahb_trans.data;
+    this.wr_rd = other_ahb_trans.wr_rd;
+    this.size = other_ahb_trans.size;
+    this.N = other_ahb_trans.N;
+endtask : copy
 
 `endif // AHB_TRANS__SV

@@ -39,8 +39,8 @@ task direct_gen::run();
         if( !pars_file() )
             break;
         if( ahb_tr.wr_rd == '1 )
-            gen2drv.send_msg(0, ahb_tr);
-        gen2drv.wait_side(1);
+            gen2drv.send_msg(ahb_tr);
+        gen2drv.wait_side();
     end
 endtask : run
 

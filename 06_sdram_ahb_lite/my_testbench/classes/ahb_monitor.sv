@@ -17,7 +17,7 @@ class ahb_monitor;
 
     ahb_trans               ahb_trans_0 = new();
 
-    socket  #(ahb_trans)    mon2cov = new(1);
+    socket  #(ahb_trans)    mon2cov = new();
 
     /* 
         ahb_slave signals
@@ -73,11 +73,7 @@ endtask : run
 
 task ahb_monitor::wait_data_cycle(ahb_trans ahb_trans_);
     ahb_trans local_trans = new();
-    local_trans.N = ahb_trans_.N;
-    local_trans.addr = ahb_trans_.addr;
-    local_trans.data = ahb_trans_.data;
-    local_trans.size = ahb_trans_.size;
-    local_trans.wr_rd = ahb_trans_.wr_rd;
+    local_trans.copy(ahb_trans_);
     if( local_trans.wr_rd )
     begin
         this.wait_clk();
@@ -95,7 +91,7 @@ task ahb_monitor::wait_data_cycle(ahb_trans ahb_trans_);
             end
         end
     end
-    mon2cov.send_msg(0,local_trans);
+    mon2cov.send_msg(local_trans);
     $info( { this.name , local_trans.to_str() } );
 endtask : wait_data_cycle
 

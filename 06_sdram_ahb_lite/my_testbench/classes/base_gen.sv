@@ -17,7 +17,7 @@ class base_gen;
 
     ahb_trans               ahb_tr = new();
 
-    socket  #(ahb_trans)    gen2drv = new(2);
+    socket  #(ahb_trans)    gen2drv = new();
 
     extern function new(string name = "", virtual ahb_lite_if vif = null);
     extern virtual task run();

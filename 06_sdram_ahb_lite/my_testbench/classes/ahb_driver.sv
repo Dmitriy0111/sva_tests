@@ -17,7 +17,7 @@ class ahb_driver;
 
     ahb_trans               ahb_trans_0 = new();
 
-    socket  #(ahb_trans)    gen2drv = new(2);
+    socket  #(ahb_trans)    gen2drv = new();
 
     /* 
         ahb_slave signals
@@ -133,7 +133,7 @@ task ahb_driver::wait_clk();
 endtask : wait_clk
 
 task ahb_driver::addr_pipe();
-    gen2drv.rec_msg(0, ahb_trans_0);
+    gen2drv.rec_msg(ahb_trans_0);
     $info( { this.name , ahb_trans_0.to_str() } );
     this.set_haddr(ahb_trans_0.addr);
     this.set_hsel('1);
@@ -148,7 +148,7 @@ task ahb_driver::addr_pipe();
             break;
     end
     this.set_hready('0);
-    gen2drv.trig_side(1);
+    gen2drv.trig_side();
 endtask : addr_pipe
 
 task ahb_driver::data_pipe();

@@ -23,12 +23,14 @@ module sdram_ahb_lite_tb();
                     SADDR_BITS          = (ROW_BITS + COL_BITS + BA_BITS);
 
     parameter       start_delay = 200,
-                    repeat_c = 10000,
+                    repeat_c = 500000,
                     rst_delay = 7,
                     T = 20;
 
     logic   [0 : 0]     HCLK;
     logic   [0 : 0]     HRESETn;
+
+    string test_name;
 
     ahb_lite_if     
     ahb_lite_if_0
@@ -129,22 +131,22 @@ module sdram_ahb_lite_tb();
 
     initial
     begin
-        string test_name;
         base_test test_0;
         $value$plusargs("TEST=%s",test_name);
         $display("TEST_NAME = %s", test_name);
-        if( test_name == "RAND_TEST" )
-        begin
-            rand_test rand_test_0 = new("RAND_TEST",ahb_lite_if_0);
-            test_0 = rand_test_0;
-        end
-        else if( test_name == "DIRECT_TEST" )
-        begin
-            direct_test direct_test_0 = new("DIRECT_TEST",ahb_lite_if_0);
-            test_0 = direct_test_0;
-        end
-        else
-            $fatal();
+        case( test_name )
+            "RAND_TEST"     :
+            begin
+                rand_test rand_test_0 = new("RAND_TEST",ahb_lite_if_0);
+                test_0 = rand_test_0;
+            end
+            "DIRECT_TEST"   :
+            begin
+                direct_test direct_test_0 = new("DIRECT_TEST",ahb_lite_if_0);
+                test_0 = direct_test_0;
+            end
+            default         : $fatal();
+        endcase
         test_0.connect();
         test_0.run();
     end

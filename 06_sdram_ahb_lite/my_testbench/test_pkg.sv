@@ -17,6 +17,7 @@ package test_pkg;
     `include    "classes/base_gen.sv"
     `include    "classes/random_gen.sv"
     `include    "classes/direct_gen.sv"
+    `include    "classes/ahb_agent.sv"
 
     `include    "classes/base_test.sv"
     `include    "classes/rand_test.sv"
