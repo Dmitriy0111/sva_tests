@@ -12,13 +12,14 @@
 
 class random_gen extends base_gen;
 
-    extern function new(string name, virtual ahb_lite_if vif);
+    extern function new(string name);
     extern task     run();
 
 endclass : random_gen
 
-function random_gen::new(string name, virtual ahb_lite_if vif);
+function random_gen::new(string name);
     super.new(name, vif);
+    db_resource#(virtual ahb_lite_if)::get("ahb_test_if", vif);
 endfunction : new
 
 task random_gen::run();

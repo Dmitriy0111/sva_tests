@@ -17,21 +17,21 @@ class direct_test extends base_test;
 
     socket      #(ahb_trans)    gen2drv = new();
 
-    extern function new(name = "", virtual ahb_lite_if ahb_vif);
+    extern function new(name = "");
     extern task     connect();
     extern task     run();
     
 endclass : direct_test
 
-function direct_test::new(name = "", virtual ahb_lite_if ahb_vif);
-    direct_gen = new("DIRECT_GEN" , ahb_vif);
-    ahb_agt  = new("AHB_AGT"  , ahb_vif);
+function direct_test::new(name = "");
+    direct_gen = new("DIRECT_GEN");
+    ahb_agt  = new("AHB_AGT",this);
 endfunction : new
 
 task direct_test::connect();
     ahb_agt.connect();
     
-    ahb_agt.ahb_drv.gen2drv.connect(gen2drv);
+    ahb_agt.ahb_drv.item_sock.connect(gen2drv);
     direct_gen.gen2drv.connect(gen2drv);
 endtask : connect
 

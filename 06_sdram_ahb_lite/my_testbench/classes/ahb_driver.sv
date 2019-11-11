@@ -10,14 +10,11 @@
 `ifndef AHB_DRIVER__SV
 `define AHB_DRIVER__SV
 
-class ahb_driver;
+class ahb_driver extends base_driver #(ahb_trans);
 
     virtual ahb_lite_if     vif;
-    string                  name;
 
     ahb_trans               ahb_trans_0 = new();
-
-    socket  #(ahb_trans)    gen2drv = new();
 
     /* 
         ahb_slave signals
@@ -36,7 +33,7 @@ class ahb_driver;
                                --------------
     */
 
-    extern function new(string name, virtual ahb_lite_if vif);
+    extern function new(string name, base_class parent);
     extern task     set_haddr(logic [31 : 0] value);
     extern task     set_hburst(logic [2 : 0] value);
     extern task     set_hmastlock(logic [0 : 0] value);
@@ -58,9 +55,11 @@ class ahb_driver;
 
 endclass : ahb_driver
 
-function ahb_driver::new(string name, virtual ahb_lite_if vif);
+function ahb_driver::new(string name, base_class parent);
     this.name = name;
-    this.vif = vif;
+    this.parent = parent;
+    if( !db_resource#(virtual ahb_lite_if)::get("ahb_test_if", vif) )
+        $fatal();
 endfunction : new
 
 task ahb_driver::set_haddr(logic [31 : 0] value);
@@ -133,7 +132,7 @@ task ahb_driver::wait_clk();
 endtask : wait_clk
 
 task ahb_driver::addr_pipe();
-    gen2drv.rec_msg(ahb_trans_0);
+    item_sock.rec_msg(ahb_trans_0);
     $info( { this.name , ahb_trans_0.to_str() } );
     this.set_haddr(ahb_trans_0.addr);
     this.set_hsel('1);
@@ -148,7 +147,7 @@ task ahb_driver::addr_pipe();
             break;
     end
     this.set_hready('0);
-    gen2drv.trig_side();
+    item_sock.trig_side();
 endtask : addr_pipe
 
 task ahb_driver::data_pipe();

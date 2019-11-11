@@ -17,21 +17,21 @@ class rand_test extends base_test;
 
     socket      #(ahb_trans)    gen2drv = new();
 
-    extern function new(name = "", virtual ahb_lite_if ahb_vif);
+    extern function new(name = "");
     extern task     run();
     extern task     connect();
     
 endclass : rand_test
 
-function rand_test::new(name = "", virtual ahb_lite_if ahb_vif);
-    rand_gen = new("RAND_GEN" , ahb_vif);
-    ahb_agt  = new("AHB_AGT"  , ahb_vif);
+function rand_test::new(name = "");
+    rand_gen = new("RAND_GEN");
+    ahb_agt  = new("AHB_AGT",this);
 endfunction : new
 
 task rand_test::connect();
     ahb_agt.connect();
 
-    ahb_agt.ahb_drv.gen2drv.connect(gen2drv);
+    ahb_agt.ahb_drv.item_sock.connect(gen2drv);
     rand_gen.gen2drv.connect(gen2drv);
 endtask : connect
 

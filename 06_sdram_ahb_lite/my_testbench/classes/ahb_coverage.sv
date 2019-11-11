@@ -10,10 +10,7 @@
 `ifndef AHB_COVERAGE__SV
 `define AHB_COVERAGE__SV
 
-class ahb_coverage;
-
-    virtual ahb_lite_if     vif;
-    string                  name;
+class ahb_coverage extends base_class;
 
     ahb_trans               ahb_trans_rec = new();
 
@@ -45,16 +42,16 @@ class ahb_coverage;
         ahb_haddr_hsize_hwrite_cross : cross ahb_haddr_cp, ahb_size_cp, ahb_hwrite_cp;
     endgroup : ahb_cg
 
-    extern function new(string name, virtual ahb_lite_if vif);
+    extern function new(string name, base_class parent);
     extern task     run();
     extern task     trig_cov();
 
 endclass : ahb_coverage
 
-function ahb_coverage::new(string name, virtual ahb_lite_if vif);
+function ahb_coverage::new(string name, base_class parent);
     this.name = name;
-    this.vif = vif;
     this.ahb_cg = new();
+    this.parent = parent;
 endfunction : new
 
 task ahb_coverage::run();

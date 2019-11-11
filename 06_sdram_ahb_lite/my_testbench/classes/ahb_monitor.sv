@@ -10,10 +10,9 @@
 `ifndef AHB_MONITOR__SV
 `define AHB_MONITOR__SV
 
-class ahb_monitor;
+class ahb_monitor extends base_class;
 
     virtual ahb_lite_if     vif;
-    string                  name;
 
     ahb_trans               ahb_trans_0 = new();
 
@@ -36,16 +35,18 @@ class ahb_monitor;
                                --------------
     */
 
-    extern function new(string name, virtual ahb_lite_if vif);
+    extern function new(string name, base_class parent);
     extern task     wait_clk();
     extern task     wait_data_cycle(ahb_trans ahb_trans_);
     extern task     run();
 
 endclass : ahb_monitor
 
-function ahb_monitor::new(string name, virtual ahb_lite_if vif);
+function ahb_monitor::new(string name, base_class parent);
     this.name = name;
-    this.vif = vif;
+    this.parent = parent;
+    if( !db_resource#(virtual ahb_lite_if)::get("ahb_test_if", vif) )
+        $fatal();
 endfunction : new
 
 task ahb_monitor::wait_clk();

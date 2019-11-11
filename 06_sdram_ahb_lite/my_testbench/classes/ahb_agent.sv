@@ -10,29 +10,25 @@
 `ifndef AHB_AGENT__SV
 `define AHB_AGENT__SV
 
-class ahb_agent;
-
-    virtual ahb_lite_if     vif;
-    string                  name;
+class ahb_agent extends base_class;
 
     ahb_driver                  ahb_drv;
     ahb_monitor                 ahb_mon;
     ahb_coverage                ahb_cov;
     socket      #(ahb_trans)    mon2cov = new();
 
-    extern function new(string name, virtual ahb_lite_if vif);
+    extern function new(string name, base_class parent);
     extern task     connect();
     extern task     run();
 
 endclass : ahb_agent
 
-function ahb_agent::new(string name, virtual ahb_lite_if vif);
+function ahb_agent::new(string name, base_class parent);
     this.name = name;
-    this.vif = vif;
-    
-    ahb_drv  = new("AHB_DRV"  , vif);
-    ahb_mon  = new("AHB_MON"  , vif);
-    ahb_cov  = new("AHB_COV"  , vif);
+    this.parent = parent;
+    ahb_drv  = new("AHB_DRV", this);
+    ahb_mon  = new("AHB_MON", this);
+    ahb_cov  = new("AHB_COV", this);
 endfunction : new
 
 task ahb_agent::connect();

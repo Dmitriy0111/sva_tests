@@ -10,7 +10,7 @@
 `ifndef BASE_TEST__SV
 `define BASE_TEST__SV
 
-class base_test;
+class base_test extends base_class;
 
     extern virtual task run();
     extern virtual task connect();

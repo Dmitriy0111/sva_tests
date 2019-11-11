@@ -14,13 +14,13 @@ class direct_gen extends base_gen;
 
     int     file_p = 0;
 
-    extern function     new(string name, virtual ahb_lite_if vif);
+    extern function     new(string name);
     extern task         run();
     extern function bit pars_file();
 
 endclass : direct_gen
 
-function direct_gen::new(string name, virtual ahb_lite_if vif);
+function direct_gen::new(string name);
     super.new(name, vif);
     file_p = $fopen("../06_sdram_ahb_lite/my_testbench/direct_test.txt","r");
     if( file_p == 0 )
@@ -28,6 +28,7 @@ function direct_gen::new(string name, virtual ahb_lite_if vif);
         $display("Direct test file not open!");
         $stop;
     end
+    db_resource#(virtual ahb_lite_if)::get("ahb_test_if", vif);
 endfunction : new
 
 task direct_gen::run();

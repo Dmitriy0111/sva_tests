@@ -9,8 +9,19 @@
 
 package test_pkg;
 
-    `include    "classes/ahb_trans.sv"
+    `include    "classes/base_class.sv"
+
+    `include    "classes/test_resource.sv"
+    `include    "classes/db_resource.sv"
+
     `include    "classes/socket.sv"
+
+    `include    "classes/ahb_trans.sv"
+    `include    "classes/base_seq.sv"
+    `include    "classes/rand_seq.sv"
+    `include    "classes/direct_seq.sv"
+
+    `include    "classes/base_driver.sv"
     `include    "classes/ahb_driver.sv"
     `include    "classes/ahb_monitor.sv"
     `include    "classes/ahb_coverage.sv"
@@ -18,7 +29,7 @@ package test_pkg;
     `include    "classes/random_gen.sv"
     `include    "classes/direct_gen.sv"
     `include    "classes/ahb_agent.sv"
-
+    
     `include    "classes/base_test.sv"
     `include    "classes/rand_test.sv"
     `include    "classes/direct_test.sv"
