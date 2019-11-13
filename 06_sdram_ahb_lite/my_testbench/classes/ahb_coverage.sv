@@ -58,7 +58,7 @@ task ahb_coverage::run();
     forever
     begin
         mon2cov.rec_msg(ahb_trans_rec);
-        $info( { this.name , ahb_trans_rec.to_str() } );
+        $info( { this.name , ahb_trans_rec.sprint() } );
         this.trig_cov();
     end
 endtask : run

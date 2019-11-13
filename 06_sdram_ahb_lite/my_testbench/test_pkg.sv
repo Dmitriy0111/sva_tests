@@ -9,6 +9,10 @@
 
 package test_pkg;
 
+    `include    "macro.svh"
+
+    `include    "classes/printer.sv"
+    
     `include    "classes/base_class.sv"
 
     `include    "classes/test_resource.sv"

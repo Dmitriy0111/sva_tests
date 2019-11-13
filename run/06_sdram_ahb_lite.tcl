@@ -10,7 +10,7 @@ vlog -sv ../06_sdram_ahb_lite/my_testbench/test_pkg.*v
 # compile testbench
 vlog -sv ../06_sdram_ahb_lite/my_testbench/*_tb.*v
 
-vsim -novopt work.sdram_ahb_lite_tb +TEST=DIRECT_TEST
+vsim -novopt work.sdram_ahb_lite_tb +TEST=RAND_TEST
 
 add wave -divider "DUT signals"
 add wave -position insertpoint sim:/sdram_ahb_lite_tb/ahb_lite_sdram_0/*

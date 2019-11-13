@@ -47,20 +47,8 @@ endtask : run
 
 // N addr data wr_rd size
 function bit direct_gen::pars_file();
-    logic   [31 : 0]    addr;
-    logic   [31 : 0]    data;
-    string              wr_rd;
-    string              size;
-    int                 N;
-    if( $fscanf(file_p,"%d %h %h %s %s",N,addr,data,wr_rd,size) == -1 )
+    if( $fscanf(file_p,"%d %h %h %s %s",ahb_tr.tr_number,ahb_tr.addr,ahb_tr.data,ahb_tr.wr_rd,ahb_tr.size) == -1 )
         return '0;
-    ahb_tr.addr = addr;
-    ahb_tr.data = data;
-    ahb_tr.N    = N;
-    ahb_tr.size = ( size == "WORD"  ? 3'b010 : 
-                    size == "HWORD" ? 3'b001 :
-                    size == "BYTE"  ? 3'b000 : 3'b010 );
-    ahb_tr.wr_rd = ( wr_rd == "WRITE"  ? '1 : '0 );
     return '1;
 endfunction : pars_file
 

@@ -61,10 +61,11 @@ task ahb_monitor::run();
         this.wait_clk();
         if( vif.HREADY && vif.HSEL && vif.HREADYOUT )
         begin
-            ahb_trans_0.N++;
+            ahb_trans_0.tr_number++;
             ahb_trans_0.wr_rd = vif.HWRITE;
             ahb_trans_0.addr = vif.HADDR;
             ahb_trans_0.size = vif.HSIZE;
+            ahb_trans_0.logic2str_fields();
             fork
                 wait_data_cycle(ahb_trans_0);
             join_none
@@ -93,7 +94,7 @@ task ahb_monitor::wait_data_cycle(ahb_trans ahb_trans_);
         end
     end
     mon2cov.send_msg(local_trans);
-    $info( { this.name , local_trans.to_str() } );
+    $info( { this.name , local_trans.sprint() } );
 endtask : wait_data_cycle
 
 `endif // AHB_MONITOR__SV

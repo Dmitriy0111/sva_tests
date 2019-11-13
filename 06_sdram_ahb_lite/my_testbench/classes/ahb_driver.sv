@@ -60,6 +60,7 @@ function ahb_driver::new(string name, base_class parent);
     this.parent = parent;
     if( !db_resource#(virtual ahb_lite_if)::get("ahb_test_if", vif) )
         $fatal();
+    $display("Created %s", this.get_name());
 endfunction : new
 
 task ahb_driver::set_haddr(logic [31 : 0] value);
@@ -133,11 +134,12 @@ endtask : wait_clk
 
 task ahb_driver::addr_pipe();
     item_sock.rec_msg(ahb_trans_0);
-    $info( { this.name , ahb_trans_0.to_str() } );
+    ahb_trans_0.print();
+    $info( { this.name , ahb_trans_0.sprint() } );
     this.set_haddr(ahb_trans_0.addr);
     this.set_hsel('1);
-    this.set_hwrite(ahb_trans_0.wr_rd);
-    this.set_hsize(ahb_trans_0.size);
+    this.set_hwrite( ahb_trans_0.wr_rd );
+    this.set_hsize( ahb_trans_0.size );
     this.set_htrans(2'b10);
     this.set_hready('1);
     for(;;)

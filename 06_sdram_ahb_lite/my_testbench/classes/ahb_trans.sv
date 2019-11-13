@@ -10,7 +10,7 @@
 `ifndef AHB_TRANS__SV
 `define AHB_TRANS__SV
 
-class ahb_trans;
+class ahb_trans extends base_class;
 
     string                      name;
 
@@ -18,8 +18,20 @@ class ahb_trans;
     rand    logic   [31 : 0]    data;
     rand    logic   [0  : 0]    wr_rd;
     rand    logic   [2  : 0]    size;
+    
+    string                      size_str;
+    string                      wr_rd_str;
+    int                         tr_number = 0;
 
-    int                         N = 0;
+    `FIELD_BEGIN( ahb_trans )
+        `FIELD_INT          ( tr_number , `ALL_FLAGS_ON | `RADIX_DEC )
+        `FIELD_INT          ( addr      , `ALL_FLAGS_ON | `RADIX_HEX )
+        `FIELD_INT          ( data      , `ALL_FLAGS_ON | `RADIX_HEX )
+        `FIELD_INT          ( wr_rd     , `ALL_FLAGS_ON | `RADIX_HEX )
+        `FIELD_INT          ( size      , `ALL_FLAGS_ON | `RADIX_HEX )
+        `FIELD_STRING       ( wr_rd_str , `ALL_FLAGS_ON              )
+        `FIELD_STRING       ( size_str  , `ALL_FLAGS_ON              )
+    `FIELD_END
 
     constraint addr_c {
         addr inside { [0 : 2**14-1] };
@@ -39,39 +51,59 @@ class ahb_trans;
     }
 
     extern function string to_str();
-    extern task            print();
     extern task            make_tr();
-    extern task            copy(ahb_trans other_ahb_trans);
+    extern function void   post_randomize();
+    extern task            str2logic_fields();
+    extern task            logic2str_fields();
 
 endclass : ahb_trans
 
 function string ahb_trans::to_str();
     string ret_str;
-    ret_str = { ret_str , $psprintf("\nTR_NUMBER = %d", N) };
+    ret_str = { ret_str , $psprintf("\nTR_NUMBER = %0d", tr_number) };
     ret_str = { ret_str , $psprintf("\nTR_ADDR   = 0x%h", addr) };
     ret_str = { ret_str , $psprintf("\nTR_DATA   = 0x%h", data) };
-    ret_str = { ret_str , $psprintf("\nTR_SIZE   = %s", ( ( size == 3'b010 ) ? "WORD ": ( size == 3'b001 ) ? "HWORD" : ( size == 3'b000 ) ? "BYTE " : "UNK" ) ) };
-    ret_str = { ret_str , $psprintf("\nWR_RD     = %s", wr_rd ? "WRITE" : "READ ") };
+    ret_str = { ret_str , $psprintf("\nTR_SIZE   = %s", size_str) };
+    ret_str = { ret_str , $psprintf("\nWR_RD     = %s", wr_rd_str) };
     return ret_str;
 endfunction : to_str
-
-task ahb_trans::print();
-    $info(this.to_str());
-endtask : print
 
 task ahb_trans::make_tr();
     if( !this.randomize() )
         $fatal("randomization error!");
-    N++;
+    tr_number++;
 endtask : make_tr
 
-task ahb_trans::copy(ahb_trans other_ahb_trans);
-    this.name = other_ahb_trans.name;
-    this.addr = other_ahb_trans.addr;
-    this.data = other_ahb_trans.data;
-    this.wr_rd = other_ahb_trans.wr_rd;
-    this.size = other_ahb_trans.size;
-    this.N = other_ahb_trans.N;
-endtask : copy
+function void ahb_trans::post_randomize();
+    this.logic2str_fields();
+endfunction : post_randomize
+
+task ahb_trans::str2logic_fields();
+    case( wr_rd_str )
+        "READ"  : wr_rd = 1'b0;
+        "WRITE" : wr_rd = 1'b1;
+        default : wr_rd = 1'b1;
+    endcase
+    case( size_str )
+        "BYTE"  : size = 3'b000;
+        "HWORD" : size = 3'b001;
+        "WORD"  : size = 3'b010;
+        default : size = 3'b010;
+    endcase
+endtask : str2logic_fields
+
+task ahb_trans::logic2str_fields();
+    case( wr_rd )
+        1'b0    : wr_rd_str = "READ";
+        1'b1    : wr_rd_str = "WRITE";
+        default : wr_rd_str = "UNK";
+    endcase
+    case( size )
+        3'b000  : size_str = "BYTE";
+        3'b001  : size_str = "HWORD";
+        3'b010  : size_str = "WORD";
+        default : size_str = "UNK";
+    endcase
+endtask : logic2str_fields
 
 `endif // AHB_TRANS__SV

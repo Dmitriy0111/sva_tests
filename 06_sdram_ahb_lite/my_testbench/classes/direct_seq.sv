@@ -40,20 +40,8 @@ endtask : seq_run
 
 // N addr data wr_rd size
 function bit direct_seq::pars_file();
-    logic   [31 : 0]    addr;
-    logic   [31 : 0]    data;
-    string              wr_rd;
-    string              size;
-    int                 N;
-    if( $fscanf(file_p,"%d %h %h %s %s",N,addr,data,wr_rd,size) == -1 )
+    if( $fscanf(file_p,"%d %h %h %s %s",item.tr_number,item.addr,item.data,item.wr_rd,item.size) == -1 )
         return '0;
-    item.addr = addr;
-    item.data = data;
-    item.N    = N;
-    item.size = ( size == "WORD"  ? 3'b010 : 
-                  size == "HWORD" ? 3'b001 :
-                  size == "BYTE"  ? 3'b000 : 3'b010 );
-    item.wr_rd = ( wr_rd == "WRITE"  ? '1 : '0 );
     return '1;
 endfunction : pars_file
 
