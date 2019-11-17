@@ -12,10 +12,19 @@
 
 class base_test extends base_class;
 
-    extern virtual task run();
-    extern virtual task connect();
+    extern         function new(string name = "", base_class parent = null);
+    extern virtual task     build();
+    extern virtual task     connect();
+    extern virtual task     run();
     
 endclass : base_test
+
+function base_test::new(string name = "", base_class parent = null);
+    super.new(name,parent);
+endfunction : new
+
+task base_test::build();
+endtask : build
 
 task base_test::connect();
 endtask : connect

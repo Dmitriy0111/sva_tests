@@ -12,9 +12,11 @@
 
 class ahb_driver extends base_driver #(ahb_trans);
 
+    `OBJECT_BEGIN( ahb_driver )
+
     virtual ahb_lite_if     vif;
 
-    ahb_trans               ahb_trans_0 = new();
+    ahb_trans               ahb_trans_0;
 
     /* 
         ahb_slave signals
@@ -51,13 +53,13 @@ class ahb_driver extends base_driver #(ahb_trans);
     extern task     wait_clk();
     extern task     addr_pipe();
     extern task     data_pipe();
+    extern task     build();
     extern task     run();
 
 endclass : ahb_driver
 
 function ahb_driver::new(string name, base_class parent);
-    this.name = name;
-    this.parent = parent;
+    super.new(name,parent);
     if( !db_resource#(virtual ahb_lite_if)::get("ahb_test_if", vif) )
         $fatal();
     $display("Created %s", this.get_name());
@@ -133,9 +135,10 @@ task ahb_driver::wait_clk();
 endtask : wait_clk
 
 task ahb_driver::addr_pipe();
-    item_sock.rec_msg(ahb_trans_0);
-    ahb_trans_0.print();
-    $info( { this.name , ahb_trans_0.sprint() } );
+    ahb_trans local_trans;
+    item_sock.rec_msg(local_trans);
+    ahb_trans_0.copy(local_trans);
+    $info( { ahb_trans_0.full_name , ahb_trans_0.sprint() } );
     this.set_haddr(ahb_trans_0.addr);
     this.set_hsel('1);
     this.set_hwrite( ahb_trans_0.wr_rd );
@@ -161,6 +164,10 @@ task ahb_driver::data_pipe();
             break;
     end
 endtask : data_pipe
+
+task ahb_driver::build();
+    ahb_trans_0 = ahb_trans::creator_::create_obj("AHB_ITEM",this);
+endtask : build
 
 task ahb_driver::run();
     @(posedge vif.HRESETn);

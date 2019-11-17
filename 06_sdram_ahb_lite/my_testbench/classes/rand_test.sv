@@ -17,16 +17,22 @@ class rand_test extends base_test;
 
     socket      #(ahb_trans)    gen2drv = new();
 
-    extern function new(name = "");
+    extern function new(string name = "", base_class parent);
     extern task     run();
+    extern task     build();
     extern task     connect();
     
 endclass : rand_test
 
-function rand_test::new(name = "");
-    rand_gen = new("RAND_GEN");
-    ahb_agt  = new("AHB_AGT",this);
+function rand_test::new(string name = "", base_class parent);
+    super.new(name,parent);
 endfunction : new
+
+task rand_test::build();
+    rand_gen = new("RAND_GEN");
+    ahb_agt  = ahb_agent::creator_::create_obj("AHB_AGT",this);
+    ahb_agt.build();
+endtask : build
 
 task rand_test::connect();
     ahb_agt.connect();

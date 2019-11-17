@@ -139,18 +139,19 @@ module sdram_ahb_lite_tb();
         case( test_name )
             "RAND_TEST"     :
             begin
-                automatic rand_test rand_test_0 = new("RAND_TEST");
+                automatic rand_test rand_test_0 = new("TEST",null);
                 test_0 = rand_test_0;
                 $display("Test name = %s", test_0.name);
             end
             "DIRECT_TEST"   :
             begin
-                automatic direct_test direct_test_0 = new("DIRECT_TEST");
+                automatic direct_test direct_test_0 = new("TEST",null);
                 test_0 = direct_test_0;
                 $display("Test name = %s", test_0.name);
             end
             default         : $fatal();
         endcase
+        test_0.build();
         test_0.connect();
         test_0.run();
     end

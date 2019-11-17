@@ -11,10 +11,12 @@
 `define AHB_MONITOR__SV
 
 class ahb_monitor extends base_class;
+    
+    `OBJECT_BEGIN( ahb_monitor )
 
     virtual ahb_lite_if     vif;
 
-    ahb_trans               ahb_trans_0 = new();
+    ahb_trans               ahb_trans_0;
 
     socket  #(ahb_trans)    mon2cov = new();
 
@@ -38,6 +40,7 @@ class ahb_monitor extends base_class;
     extern function new(string name, base_class parent);
     extern task     wait_clk();
     extern task     wait_data_cycle(ahb_trans ahb_trans_);
+    extern task     build();
     extern task     run();
 
 endclass : ahb_monitor
@@ -52,6 +55,10 @@ endfunction : new
 task ahb_monitor::wait_clk();
     @(posedge vif.HCLK);
 endtask : wait_clk
+
+task ahb_monitor::build();
+    ahb_trans_0 = ahb_trans::creator_::create_obj("AHB_ITEM",this);
+endtask : build
 
 task ahb_monitor::run();
     @(posedge vif.HRESETn);
@@ -94,7 +101,7 @@ task ahb_monitor::wait_data_cycle(ahb_trans ahb_trans_);
         end
     end
     mon2cov.send_msg(local_trans);
-    $info( { this.name , local_trans.sprint() } );
+    $info( { local_trans.full_name , local_trans.sprint() } );
 endtask : wait_data_cycle
 
 `endif // AHB_MONITOR__SV

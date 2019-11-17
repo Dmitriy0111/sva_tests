@@ -12,7 +12,7 @@
 
 class ahb_trans extends base_class;
 
-    string                      name;
+    `OBJECT_BEGIN( ahb_trans )
 
     rand    logic   [31 : 0]    addr;
     rand    logic   [31 : 0]    data;
@@ -55,6 +55,10 @@ class ahb_trans extends base_class;
     extern function void   post_randomize();
     extern task            str2logic_fields();
     extern task            logic2str_fields();
+
+    function new(string name ="", base_class parent = null);
+        super.new(name, parent);
+    endfunction : new
 
 endclass : ahb_trans
 

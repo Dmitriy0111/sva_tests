@@ -17,16 +17,22 @@ class direct_test extends base_test;
 
     socket      #(ahb_trans)    gen2drv = new();
 
-    extern function new(name = "");
+    extern function new(string name = "", base_class parent);
     extern task     connect();
+    extern task     build();
     extern task     run();
     
 endclass : direct_test
 
-function direct_test::new(name = "");
-    direct_gen = new("DIRECT_GEN");
-    ahb_agt  = new("AHB_AGT",this);
+function direct_test::new(string name = "", base_class parent);
+    super.new(name,parent);
 endfunction : new
+
+task direct_test::build();
+    direct_gen = new("DIRECT_GEN");
+    ahb_agt  = ahb_agent::creator_::create_obj("AHB_AGT",this);
+    ahb_agt.build();
+endtask : build
 
 task direct_test::connect();
     ahb_agt.connect();

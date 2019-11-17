@@ -94,4 +94,7 @@
 `define FIELD_END \
     endfunction : help_f \
 
+`define OBJECT_BEGIN(T) \
+    typedef creator #(T) creator_; \
+
 `endif // MACRO__SV

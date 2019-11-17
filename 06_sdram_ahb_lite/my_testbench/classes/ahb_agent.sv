@@ -12,24 +12,32 @@
 
 class ahb_agent extends base_class;
 
+    `OBJECT_BEGIN( ahb_agent )
+
     ahb_driver                  ahb_drv;
     ahb_monitor                 ahb_mon;
     ahb_coverage                ahb_cov;
     socket      #(ahb_trans)    mon2cov = new();
 
     extern function new(string name, base_class parent);
+    extern task     build();
     extern task     connect();
     extern task     run();
 
 endclass : ahb_agent
 
 function ahb_agent::new(string name, base_class parent);
-    this.name = name;
-    this.parent = parent;
-    ahb_drv  = new("AHB_DRV", this);
-    ahb_mon  = new("AHB_MON", this);
-    ahb_cov  = new("AHB_COV", this);
+    super.new(name,parent);
 endfunction : new
+
+task ahb_agent::build();
+    ahb_drv  = ahb_driver::creator_::create_obj("AHB_DRV", this);
+    ahb_mon  = ahb_monitor::creator_::create_obj("AHB_MON", this);
+    ahb_cov  = ahb_coverage::creator_::create_obj("AHB_COV", this);
+    ahb_drv.build();
+    ahb_mon.build();
+    ahb_cov.build();
+endtask : build
 
 task ahb_agent::connect();
     ahb_mon.mon2cov.connect(mon2cov);

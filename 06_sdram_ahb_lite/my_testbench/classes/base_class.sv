@@ -19,17 +19,23 @@ class base_class;
 
     printer         printer_ = new();
 
-    extern virtual task run();
-
-    extern function          string     get_name();
-    extern function          void       print();
-    extern function          string     sprint();
-    extern task                         copy(base_class other_obj);
-    extern function          base_class clone();
-    extern function          bit        compare();
+    extern          function            new(string name = "", base_class parent = null);
+    extern virtual  task                run();
+    extern          function string     get_name();
+    extern          function void       print();
+    extern          function string     sprint();
+    extern          task                copy(base_class other_obj);
+    extern          function base_class clone();
+    extern          function bit        compare();
     extern virtual  function void       help_f(base_class this_obj = null, logic [7 : 0] operation);
 
 endclass : base_class
+
+function base_class::new(string name = "", base_class parent = null);
+    this.name = name;
+    this.parent = parent;
+    this.full_name = name;
+endfunction : new
 
 task base_class::run();
 endtask : run

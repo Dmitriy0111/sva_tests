@@ -12,6 +12,7 @@ package test_pkg;
     `include    "macro.svh"
 
     `include    "classes/printer.sv"
+    `include    "classes/creator.sv"
     
     `include    "classes/base_class.sv"
 

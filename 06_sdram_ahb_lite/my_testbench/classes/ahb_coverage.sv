@@ -12,7 +12,9 @@
 
 class ahb_coverage extends base_class;
 
-    ahb_trans               ahb_trans_rec = new();
+    `OBJECT_BEGIN( ahb_coverage )
+
+    ahb_trans               ahb_trans_rec;
 
     socket  #(ahb_trans)    mon2cov = new();
 
@@ -43,6 +45,7 @@ class ahb_coverage extends base_class;
     endgroup : ahb_cg
 
     extern function new(string name, base_class parent);
+    extern task     build();
     extern task     run();
     extern task     trig_cov();
 
@@ -54,11 +57,17 @@ function ahb_coverage::new(string name, base_class parent);
     this.parent = parent;
 endfunction : new
 
+task ahb_coverage::build();
+    ahb_trans_rec = ahb_trans::creator_::create_obj("AHB_ITEM",this);
+endtask : build
+
 task ahb_coverage::run();
     forever
     begin
-        mon2cov.rec_msg(ahb_trans_rec);
-        $info( { this.name , ahb_trans_rec.sprint() } );
+        ahb_trans local_trans;
+        mon2cov.rec_msg(local_trans);
+        ahb_trans_rec.copy(local_trans);
+        $info( { ahb_trans_rec.full_name , ahb_trans_rec.sprint() } );
         this.trig_cov();
     end
 endtask : run

@@ -14,6 +14,12 @@ class base_driver #(type seq_type) extends base_class;
 
     socket  #(seq_type)     item_sock = new();
 
+    extern function new(string name, base_class parent);
+
 endclass : base_driver
+
+function base_driver::new(string name, base_class parent);
+    super.new(name,parent);
+endfunction : new
 
 `endif // BASE_DRIVER__SV
